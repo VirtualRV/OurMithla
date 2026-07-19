@@ -1,0 +1,291 @@
+export type Locale = "en" | "hi" | "mai"
+
+export const LOCALES: { code: Locale; label: string; native: string }[] = [
+  { code: "en", label: "English", native: "English" },
+  { code: "hi", label: "Hindi", native: "हिन्दी" },
+  { code: "mai", label: "Maithili", native: "मैथिली" },
+]
+
+export const DEFAULT_LOCALE: Locale = "en"
+
+/**
+ * Translation dictionary.
+ *
+ * To add or extend a language:
+ * 1. Add its code to the `Locale` union and the `LOCALES` array above.
+ * 2. Provide a matching object below with the same keys as `en`.
+ * Missing keys automatically fall back to English (see `t()` in the provider).
+ */
+export const translations = {
+  en: {
+    "brand.name": "OurMithla",
+    "brand.tagline": "Culture, Almanac & Community of Mithila",
+
+    "nav.home": "Home",
+    "nav.blog": "Blog",
+    "nav.panchang": "Panchang",
+    "nav.contact": "Contact",
+    "nav.language": "Language",
+
+    "home.hero.eyebrow": "Welcome to OurMithla",
+    "home.hero.title": "Celebrating the living heritage of Mithila",
+    "home.hero.subtitle":
+      "Stories, traditions, festivals, and the daily Hindu Panchang — all in your language.",
+    "home.hero.cta.blog": "Read the Blog",
+    "home.hero.cta.panchang": "Today's Panchang",
+
+    "home.features.title": "Explore OurMithla",
+    "home.features.blog.title": "Cultural Blog",
+    "home.features.blog.desc":
+      "Articles on Madhubani art, festivals, cuisine, and folklore of the Mithila region.",
+    "home.features.panchang.title": "Daily Panchang",
+    "home.features.panchang.desc":
+      "Tithi, Nakshatra, Yoga, Karana, and auspicious timings — updated every day.",
+    "home.features.community.title": "Community",
+    "home.features.community.desc":
+      "Connect with us, share your stories, and stay updated on cultural events.",
+
+    "home.featured.title": "Featured Articles",
+    "home.featured.viewAll": "View all articles",
+    "home.latest.title": "Latest Articles",
+
+    "home.panchang.title": "Today at a Glance",
+    "home.panchang.desc":
+      "A quick look at today's Panchang. Open the full almanac for detailed muhurats.",
+    "home.panchang.open": "Open full Panchang",
+
+    "blog.title": "The OurMithla Blog",
+    "blog.subtitle": "Stories and knowledge from the heart of Mithila.",
+    "blog.categories.all": "All",
+    "blog.featured": "Featured",
+    "blog.readMore": "Read more",
+    "blog.minRead": "min read",
+    "blog.empty": "No articles found in this category.",
+    "blog.prev": "Previous",
+    "blog.next": "Next",
+    "blog.page": "Page",
+    "blog.of": "of",
+    "blog.backToBlog": "Back to blog",
+    "blog.relatedTitle": "More articles",
+    "blog.notFound": "Article not found",
+    "blog.notFoundDesc": "The article you are looking for does not exist or has moved.",
+
+    "contact.title": "Contact Us",
+    "contact.subtitle":
+      "Have a question, a story to share, or a partnership idea? We'd love to hear from you.",
+    "contact.form.name": "Full Name",
+    "contact.form.email": "Email Address",
+    "contact.form.phone": "Phone Number",
+    "contact.form.message": "Message",
+    "contact.form.namePlaceholder": "Your name",
+    "contact.form.emailPlaceholder": "you@example.com",
+    "contact.form.phonePlaceholder": "+91 00000 00000",
+    "contact.form.messagePlaceholder": "How can we help you?",
+    "contact.form.submit": "Send Message",
+    "contact.form.submitting": "Sending...",
+    "contact.form.success":
+      "Thank you! Your message has been received. Check your inbox for a welcome note.",
+    "contact.form.error": "Something went wrong. Please try again.",
+    "contact.form.captchaRequired": "Please complete the captcha.",
+    "contact.form.required": "This field is required.",
+    "contact.form.invalidEmail": "Please enter a valid email address.",
+    "contact.info.title": "Get in touch",
+    "contact.info.desc": "Reach out through the form or the details below.",
+    "contact.info.emailLabel": "Email",
+    "contact.info.locationLabel": "Region",
+    "contact.info.location": "Mithila (Bihar, India & Madhesh, Nepal)",
+
+    "ad.label": "Advertisement",
+
+    "footer.about.title": "About OurMithla",
+    "footer.about.desc":
+      "A cultural home for the people of Mithila — preserving heritage and serving the community.",
+    "footer.links.title": "Quick Links",
+    "footer.follow.title": "Stay Connected",
+    "footer.rights": "All rights reserved.",
+
+    "panchang.pageTitle": "Daily Panchang",
+  },
+
+  hi: {
+    "brand.name": "अवरमिथिला",
+    "brand.tagline": "मिथिला की संस्कृति, पंचांग और समुदाय",
+
+    "nav.home": "होम",
+    "nav.blog": "ब्लॉग",
+    "nav.panchang": "पंचांग",
+    "nav.contact": "संपर्क",
+    "nav.language": "भाषा",
+
+    "home.hero.eyebrow": "अवरमिथिला में आपका स्वागत है",
+    "home.hero.title": "मिथिला की जीवंत विरासत का उत्सव",
+    "home.hero.subtitle":
+      "कहानियाँ, परंपराएँ, त्योहार और दैनिक हिन्दू पंचांग — सब आपकी भाषा में।",
+    "home.hero.cta.blog": "ब्लॉग पढ़ें",
+    "home.hero.cta.panchang": "आज का पंचांग",
+
+    "home.features.title": "अवरमिथिला को जानें",
+    "home.features.blog.title": "सांस्कृतिक ब्लॉग",
+    "home.features.blog.desc":
+      "मधुबनी कला, त्योहारों, व्यंजनों और मिथिला की लोककथाओं पर लेख।",
+    "home.features.panchang.title": "दैनिक पंचांग",
+    "home.features.panchang.desc":
+      "तिथि, नक्षत्र, योग, करण और शुभ मुहूर्त — प्रतिदिन अद्यतन।",
+    "home.features.community.title": "समुदाय",
+    "home.features.community.desc":
+      "हमसे जुड़ें, अपनी कहानियाँ साझा करें और सांस्कृतिक कार्यक्रमों की जानकारी पाएँ।",
+
+    "home.featured.title": "विशेष लेख",
+    "home.featured.viewAll": "सभी लेख देखें",
+    "home.latest.title": "नवीनतम लेख",
+
+    "home.panchang.title": "आज एक नज़र में",
+    "home.panchang.desc":
+      "आज के पंचांग की झलक। विस्तृत मुहूर्त के लिए पूरा पंचांग खोलें।",
+    "home.panchang.open": "पूरा पंचांग खोलें",
+
+    "blog.title": "अवरमिथिला ब्लॉग",
+    "blog.subtitle": "मिथिला के हृदय से कहानियाँ और ज्ञान।",
+    "blog.categories.all": "सभी",
+    "blog.featured": "विशेष",
+    "blog.readMore": "और पढ़ें",
+    "blog.minRead": "मिनट पढ़ें",
+    "blog.empty": "इस श्रेणी में कोई लेख नहीं मिला।",
+    "blog.prev": "पिछला",
+    "blog.next": "अगला",
+    "blog.page": "पृष्ठ",
+    "blog.of": "में से",
+    "blog.backToBlog": "ब्लॉग पर लौटें",
+    "blog.relatedTitle": "और लेख",
+    "blog.notFound": "लेख नहीं मिला",
+    "blog.notFoundDesc": "आप जिस लेख को खोज रहे हैं वह मौजूद नहीं है या स्थानांतरित हो गया है।",
+
+    "contact.title": "संपर्क करें",
+    "contact.subtitle":
+      "कोई प्रश्न, साझा करने के लिए कहानी, या साझेदारी का विचार है? हमें आपसे सुनना अच्छा लगेगा।",
+    "contact.form.name": "पूरा नाम",
+    "contact.form.email": "ईमेल पता",
+    "contact.form.phone": "फ़ोन नंबर",
+    "contact.form.message": "संदेश",
+    "contact.form.namePlaceholder": "आपका नाम",
+    "contact.form.emailPlaceholder": "you@example.com",
+    "contact.form.phonePlaceholder": "+91 00000 00000",
+    "contact.form.messagePlaceholder": "हम आपकी कैसे मदद कर सकते हैं?",
+    "contact.form.submit": "संदेश भेजें",
+    "contact.form.submitting": "भेजा जा रहा है...",
+    "contact.form.success":
+      "धन्यवाद! आपका संदेश प्राप्त हो गया है। स्वागत संदेश के लिए अपना इनबॉक्स देखें।",
+    "contact.form.error": "कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+    "contact.form.captchaRequired": "कृपया कैप्चा पूरा करें।",
+    "contact.form.required": "यह फ़ील्ड आवश्यक है।",
+    "contact.form.invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+    "contact.info.title": "संपर्क में रहें",
+    "contact.info.desc": "फ़ॉर्म या नीचे दिए गए विवरण के माध्यम से संपर्क करें।",
+    "contact.info.emailLabel": "ईमेल",
+    "contact.info.locationLabel": "क्षेत्र",
+    "contact.info.location": "मिथिला (बिहार, भारत और मधेश, नेपाल)",
+
+    "ad.label": "विज्ञापन",
+
+    "footer.about.title": "अवरमिथिला के बारे में",
+    "footer.about.desc":
+      "मिथिला के लोगों का सांस्कृतिक घर — विरासत का संरक्षण और समुदाय की सेवा।",
+    "footer.links.title": "त्वरित लिंक",
+    "footer.follow.title": "जुड़े रहें",
+    "footer.rights": "सर्वाधिकार सुरक्षित।",
+
+    "panchang.pageTitle": "दैनिक पंचांग",
+  },
+
+  mai: {
+    "brand.name": "अपन मिथिला",
+    "brand.tagline": "मिथिलाक संस्कृति, पंचांग आ समुदाय",
+
+    "nav.home": "मुख्य पृष्ठ",
+    "nav.blog": "ब्लॉग",
+    "nav.panchang": "पंचांग",
+    "nav.contact": "संपर्क",
+    "nav.language": "भाषा",
+
+    "home.hero.eyebrow": "अपन मिथिला मे अहाँक स्वागत अछि",
+    "home.hero.title": "मिथिलाक जीवंत धरोहरक उत्सव",
+    "home.hero.subtitle":
+      "कथा, परंपरा, पाबनि आ दैनिक हिन्दू पंचांग — सभ अहाँक भाषा मे।",
+    "home.hero.cta.blog": "ब्लॉग पढ़ू",
+    "home.hero.cta.panchang": "आइक पंचांग",
+
+    "home.features.title": "अपन मिथिला केँ जानू",
+    "home.features.blog.title": "सांस्कृतिक ब्लॉग",
+    "home.features.blog.desc":
+      "मधुबनी कला, पाबनि, व्यंजन आ मिथिलाक लोककथा पर आलेख।",
+    "home.features.panchang.title": "दैनिक पंचांग",
+    "home.features.panchang.desc":
+      "तिथि, नक्षत्र, योग, करण आ शुभ मुहूर्त — रोज अद्यतन।",
+    "home.features.community.title": "समुदाय",
+    "home.features.community.desc":
+      "हमरा सभ सँ जुड़ू, अपन कथा साझा करू आ सांस्कृतिक आयोजनक जानकारी पाबू।",
+
+    "home.featured.title": "विशेष आलेख",
+    "home.featured.viewAll": "सभ आलेख देखू",
+    "home.latest.title": "नवीनतम आलेख",
+
+    "home.panchang.title": "आइ एक नजरि मे",
+    "home.panchang.desc":
+      "आइक पंचांगक झलक। विस्तृत मुहूर्त लेल पूरा पंचांग खोलू।",
+    "home.panchang.open": "पूरा पंचांग खोलू",
+
+    "blog.title": "अपन मिथिला ब्लॉग",
+    "blog.subtitle": "मिथिलाक हृदय सँ कथा आ ज्ञान।",
+    "blog.categories.all": "सभ",
+    "blog.featured": "विशेष",
+    "blog.readMore": "आओर पढ़ू",
+    "blog.minRead": "मिनट पढ़ब",
+    "blog.empty": "एहि श्रेणी मे कोनो आलेख नहि भेटल।",
+    "blog.prev": "पछिला",
+    "blog.next": "अगिला",
+    "blog.page": "पृष्ठ",
+    "blog.of": "मे सँ",
+    "blog.backToBlog": "ब्लॉग पर घुरू",
+    "blog.relatedTitle": "आओर आलेख",
+    "blog.notFound": "आलेख नहि भेटल",
+    "blog.notFoundDesc": "अहाँ जे आलेख तकैत छी ओ मौजूद नहि अछि वा हटा देल गेल अछि।",
+
+    "contact.title": "संपर्क करू",
+    "contact.subtitle":
+      "कोनो प्रश्न, साझा करबा लेल कथा, वा साझेदारीक विचार अछि? हमरा अहाँ सँ सुनि नीक लागत।",
+    "contact.form.name": "पूरा नाम",
+    "contact.form.email": "ईमेल पता",
+    "contact.form.phone": "फोन नंबर",
+    "contact.form.message": "संदेश",
+    "contact.form.namePlaceholder": "अहाँक नाम",
+    "contact.form.emailPlaceholder": "you@example.com",
+    "contact.form.phonePlaceholder": "+91 00000 00000",
+    "contact.form.messagePlaceholder": "हम अहाँक कोना मदति करी?",
+    "contact.form.submit": "संदेश पठाउ",
+    "contact.form.submitting": "पठाओल जाइत अछि...",
+    "contact.form.success":
+      "धन्यवाद! अहाँक संदेश भेट गेल। स्वागत संदेश लेल अपन इनबॉक्स देखू।",
+    "contact.form.error": "किछु गलत भ' गेल। कृपया फेर सँ प्रयास करू।",
+    "contact.form.captchaRequired": "कृपया कैप्चा पूरा करू।",
+    "contact.form.required": "ई फील्ड आवश्यक अछि।",
+    "contact.form.invalidEmail": "कृपया मान्य ईमेल पता दिअ।",
+    "contact.info.title": "संपर्क मे रहू",
+    "contact.info.desc": "फॉर्म वा नीचाँ देल विवरणक माध्यम सँ संपर्क करू।",
+    "contact.info.emailLabel": "ईमेल",
+    "contact.info.locationLabel": "क्षेत्र",
+    "contact.info.location": "मिथिला (बिहार, भारत आ मधेश, नेपाल)",
+
+    "ad.label": "विज्ञापन",
+
+    "footer.about.title": "अपन मिथिलाक बारे मे",
+    "footer.about.desc":
+      "मिथिलाक लोकक सांस्कृतिक घर — धरोहरक संरक्षण आ समुदायक सेवा।",
+    "footer.links.title": "त्वरित लिंक",
+    "footer.follow.title": "जुड़ल रहू",
+    "footer.rights": "सर्वाधिकार सुरक्षित।",
+
+    "panchang.pageTitle": "दैनिक पंचांग",
+  },
+} as const
+
+export type TranslationKey = keyof (typeof translations)["en"]
