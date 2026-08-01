@@ -7,6 +7,7 @@ import { MainDetails } from "@/components/panchang/main-details"
 import { SunMoon } from "@/components/panchang/sun-moon"
 import { Muhurat } from "@/components/panchang/muhurat"
 import { MonthInfo } from "@/components/panchang/month-info"
+import { UpcomingEventsBanner } from "@/components/panchang/upcoming-events-banner"
 import { AdSlot } from "@/components/ad-slot"
 import { useI18n } from "@/components/i18n-provider"
 
@@ -48,6 +49,8 @@ export default function PanchangPage() {
           onToday={() => setDate(startOfDay(new Date()))}
           onLocationChange={setLocationId}
         />
+
+        <UpcomingEventsBanner date={date} locationId={locationId} />
 
         <MainDetails panchang={panchang} />
 

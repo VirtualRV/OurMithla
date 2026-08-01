@@ -1,24 +1,14 @@
 import "server-only"
-import { getPool, isDbConfigured, sql } from "@/lib/db"
+import fs from "fs"
+import path from "path"
+import { BlogPost, BlogPostInput, CATEGORIES, slugify } from "@/lib/blog-types"
 
-export type BlogPost = {
-  id: number
-  slug: string
-  title: string
-  excerpt: string
-  content: string
-  category: string
-  author: string
-  coverImage: string
-  featured: boolean
-  readMinutes: number
-  publishedAt: string // ISO date
-}
+export type { BlogPost, BlogPostInput }
+export { CATEGORIES, slugify }
 
-/**
- * Bundled seed data. Used as a fallback when MS SQL Server is not configured
- * (for example, in the v0 preview) so the blog always renders.
- */
+const DATA_FILE = path.join(process.cwd(), "data", "posts.json")
+
+/** Initial seed data fallback if JSON file doesn't exist */
 export const SEED_POSTS: BlogPost[] = [
   {
     id: 1,
@@ -32,6 +22,7 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Anjali Jha",
     coverImage: "/images/blog-madhubani.png",
     featured: true,
+    isPublished: true,
     readMinutes: 6,
     publishedAt: "2026-06-20",
   },
@@ -47,6 +38,7 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Ramesh Mishra",
     coverImage: "/images/blog-chhath.png",
     featured: true,
+    isPublished: true,
     readMinutes: 5,
     publishedAt: "2026-06-14",
   },
@@ -62,6 +54,7 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Sunita Devi",
     coverImage: "/images/blog-janakpur.png",
     featured: false,
+    isPublished: true,
     readMinutes: 7,
     publishedAt: "2026-06-08",
   },
@@ -77,6 +70,7 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Priya Karn",
     coverImage: "/images/blog-makhana.png",
     featured: false,
+    isPublished: true,
     readMinutes: 4,
     publishedAt: "2026-05-30",
   },
@@ -92,6 +86,7 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Dr. Mohan Thakur",
     coverImage: "/images/blog-vidyapati.png",
     featured: false,
+    isPublished: true,
     readMinutes: 6,
     publishedAt: "2026-05-22",
   },
@@ -107,64 +102,199 @@ export const SEED_POSTS: BlogPost[] = [
     author: "Kavita Jha",
     coverImage: "/images/blog-sama-chakeva.png",
     featured: false,
+    isPublished: true,
     readMinutes: 5,
     publishedAt: "2026-05-15",
   },
 ]
 
-export const CATEGORIES = ["Art", "Festivals", "Heritage", "Cuisine", "Literature"] as const
+/* Helper to read posts from data/posts.json */
+async function readJsonPosts(): Promise<BlogPost[]> {
+  try {
+    if (!fs.existsSync(DATA_FILE)) {
+      const dir = path.dirname(DATA_FILE)
+      if (!fs.existsSync(dir)) {
+        await fs.promises.mkdir(dir, { recursive: true })
+      }
+      await fs.promises.writeFile(DATA_FILE, JSON.stringify(SEED_POSTS, null, 2), "utf-8")
+      return SEED_POSTS
+    }
+    const content = await fs.promises.readFile(DATA_FILE, "utf-8")
+    const data = JSON.parse(content)
+    return Array.isArray(data) ? data : SEED_POSTS
+  } catch (err) {
+    console.error("[Blog] Failed reading posts.json:", err)
+    return SEED_POSTS
+  }
+}
 
-function mapRow(row: Record<string, unknown>): BlogPost {
+/* Helper to write posts to data/posts.json */
+async function writeJsonPosts(posts: BlogPost[]): Promise<void> {
+  const dir = path.dirname(DATA_FILE)
+  if (!fs.existsSync(dir)) {
+    await fs.promises.mkdir(dir, { recursive: true })
+  }
+  await fs.promises.writeFile(DATA_FILE, JSON.stringify(posts, null, 2), "utf-8")
+}
+
+/** Like a blog post by ID */
+export async function likePost(id: number): Promise<number> {
+  const posts = await readJsonPosts()
+  const index = posts.findIndex((p) => p.id === id)
+  if (index === -1) return 0
+
+  const currentLikes = posts[index].likesCount ?? 0
+  const newLikes = currentLikes + 1
+  posts[index].likesCount = newLikes
+
+  await writeJsonPosts(posts)
+  return newLikes
+}
+
+/** Add a comment to a blog post by ID */
+export async function addComment(id: number, author: string, content: string) {
+  const posts = await readJsonPosts()
+  const index = posts.findIndex((p) => p.id === id)
+  if (index === -1) return null
+
+  const existingComments = posts[index].comments || []
+  const newComment = {
+    id: `c_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    author: author.trim() || "Anonymous Reader",
+    content: content.trim(),
+    createdAt: new Date().toISOString().slice(0, 10),
+  }
+
+  const updatedComments = [newComment, ...existingComments]
+  posts[index].comments = updatedComments
+
+  await writeJsonPosts(posts)
+  return updatedComments
+}
+
+function computeReadMinutes(content: string): number {
+  const words = content.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / 200))
+}
+
+function processPost(p: BlogPost): BlogPost {
   return {
-    id: Number(row.Id),
-    slug: String(row.Slug),
-    title: String(row.Title),
-    excerpt: String(row.Excerpt),
-    content: String(row.Content),
-    category: String(row.Category),
-    author: String(row.Author),
-    coverImage: String(row.CoverImage),
-    featured: Boolean(row.Featured),
-    readMinutes: Number(row.ReadMinutes),
-    publishedAt: new Date(row.PublishedAt as string).toISOString().slice(0, 10),
+    ...p,
+    readMinutes: computeReadMinutes(p.content),
+    likesCount: p.likesCount ?? 0,
+    comments: p.comments || [],
   }
 }
 
-/** Fetch all published posts, newest first. Falls back to seed data. */
+/** Fetch all published posts, newest first. */
 export async function getAllPosts(): Promise<BlogPost[]> {
-  if (!isDbConfigured()) return sortByDate(SEED_POSTS)
-  try {
-    const pool = await getPool()
-    const result = await pool
-      .request()
-      .query(
-        "SELECT Id, Slug, Title, Excerpt, Content, Category, Author, CoverImage, Featured, ReadMinutes, PublishedAt FROM dbo.BlogPosts WHERE IsPublished = 1 ORDER BY PublishedAt DESC",
-      )
-    return result.recordset.map(mapRow)
-  } catch (err) {
-    console.log("[v0] Blog DB read failed, using seed data:", (err as Error).message)
-    return sortByDate(SEED_POSTS)
-  }
+  const posts = await readJsonPosts()
+  return sortByDate(posts.filter((p) => p.isPublished !== false).map(processPost))
 }
 
-/** Fetch a single post by slug. Falls back to seed data. */
+/** Fetch ALL posts (published and drafts) for admin dashboard */
+export async function getAllAdminPosts(): Promise<BlogPost[]> {
+  const posts = await readJsonPosts()
+  return sortByDate(posts.map(processPost))
+}
+
+/** Fetch a single post by slug. */
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  if (!isDbConfigured()) return SEED_POSTS.find((p) => p.slug === slug) ?? null
-  try {
-    const pool = await getPool()
-    const result = await pool
-      .request()
-      .input("slug", sql.NVarChar, slug)
-      .query(
-        "SELECT Id, Slug, Title, Excerpt, Content, Category, Author, CoverImage, Featured, ReadMinutes, PublishedAt FROM dbo.BlogPosts WHERE Slug = @slug AND IsPublished = 1",
-      )
-    return result.recordset[0] ? mapRow(result.recordset[0]) : null
-  } catch (err) {
-    console.log("[v0] Blog DB read failed, using seed data:", (err as Error).message)
-    return SEED_POSTS.find((p) => p.slug === slug) ?? null
+  const posts = await readJsonPosts()
+  const post = posts.find((p) => p.slug === slug && p.isPublished !== false)
+  return post ? processPost(post) : null
+}
+
+/** Fetch a single post by ID. */
+export async function getPostById(id: number): Promise<BlogPost | null> {
+  const posts = await readJsonPosts()
+  const post = posts.find((p) => p.id === id)
+  return post ? processPost(post) : null
+}
+
+/** Create a new blog post */
+export async function createPost(input: BlogPostInput): Promise<BlogPost> {
+  const slug = input.slug ? slugify(input.slug) : slugify(input.title)
+  const publishedAt = input.publishedAt || new Date().toISOString().slice(0, 10)
+  const readMinutes = computeReadMinutes(input.content)
+  const featured = Boolean(input.featured)
+  const isPublished = input.isPublished !== undefined ? Boolean(input.isPublished) : true
+
+  const posts = await readJsonPosts()
+  const maxId = posts.reduce((max, p) => (p.id > max ? p.id : max), 0)
+  const newPost: BlogPost = {
+    id: maxId + 1,
+    slug,
+    title: input.title,
+    excerpt: input.excerpt,
+    content: input.content,
+    category: input.category,
+    author: input.author,
+    coverImage: input.coverImage || "/placeholder.jpg",
+    featured,
+    isPublished,
+    readMinutes,
+    publishedAt,
+    likesCount: 0,
+    comments: [],
   }
+
+  posts.unshift(newPost)
+  await writeJsonPosts(posts)
+  return newPost
+}
+
+/** Update an existing blog post */
+export async function updatePost(id: number, input: Partial<BlogPostInput>): Promise<BlogPost | null> {
+  const posts = await readJsonPosts()
+  const index = posts.findIndex((p) => p.id === id)
+  if (index === -1) return null
+
+  const existing = posts[index]
+  const slug = input.slug ? slugify(input.slug) : existing.slug
+  const title = input.title ?? existing.title
+  const excerpt = input.excerpt ?? existing.excerpt
+  const content = input.content ?? existing.content
+  const category = input.category ?? existing.category
+  const author = input.author ?? existing.author
+  const coverImage = input.coverImage ?? existing.coverImage
+  const featured = input.featured !== undefined ? Boolean(input.featured) : existing.featured
+  const isPublished = input.isPublished !== undefined ? Boolean(input.isPublished) : existing.isPublished
+  const readMinutes = computeReadMinutes(content)
+  const publishedAt = input.publishedAt ?? existing.publishedAt
+
+  const updated: BlogPost = {
+    ...existing,
+    slug,
+    title,
+    excerpt,
+    content,
+    category,
+    author,
+    coverImage,
+    featured,
+    isPublished,
+    readMinutes,
+    publishedAt,
+  }
+
+  posts[index] = updated
+  await writeJsonPosts(posts)
+  return updated
+}
+
+/** Delete a blog post by ID */
+export async function deletePost(id: number): Promise<boolean> {
+  const posts = await readJsonPosts()
+  const filtered = posts.filter((p) => p.id !== id)
+  if (filtered.length === posts.length) return false
+
+  await writeJsonPosts(filtered)
+  return true
 }
 
 function sortByDate(posts: BlogPost[]): BlogPost[] {
   return [...posts].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
 }
+
+

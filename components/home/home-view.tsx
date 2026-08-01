@@ -23,26 +23,40 @@ function TodayPanchangCard() {
   ]
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="flex items-center gap-2 text-primary">
-        <Sun className="size-5" />
-        <h3 className="font-serif text-xl text-foreground">{t("home.panchang.title")}</h3>
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-primary">
+          <Sun className="size-5" />
+          <h3 className="font-serif text-xl text-foreground">{t("home.panchang.title")}</h3>
+        </div>
+        <span className="rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
+          {p.vishnuStatus.isSleeping ? "☸️ Yog Nidra" : "☀️ Hari Jagrit"}
+        </span>
       </div>
-      <p className="mt-2 text-sm text-muted-foreground">{t("home.panchang.desc")}</p>
-      <dl className="mt-5 grid grid-cols-2 gap-3">
+
+      {p.festivals.length > 0 && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-2.5 text-xs font-semibold text-primary">
+          {p.festivals[0]}
+        </div>
+      )}
+
+      <p className="text-sm text-muted-foreground">{t("home.panchang.desc")}</p>
+
+      <dl className="grid grid-cols-2 gap-3">
         {items.map((it) => (
-          <div key={it.label} className="rounded-xl bg-secondary/60 px-4 py-3">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">{it.label}</dt>
-            <dd className="mt-0.5 font-serif text-base text-foreground">{it.value}</dd>
+          <div key={it.label} className="rounded-xl bg-secondary/60 px-3.5 py-2.5">
+            <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">{it.label}</dt>
+            <dd className="mt-0.5 font-serif text-sm font-semibold text-foreground line-clamp-1">{it.value}</dd>
           </div>
         ))}
       </dl>
+
       <Button
         render={<Link href="/panchang" />}
         nativeButton={false}
         variant="outline"
         size="lg"
-        className="mt-5 w-full"
+        className="w-full"
       >
         {t("home.panchang.open")}
         <ArrowRight className="size-4" />

@@ -2,8 +2,8 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Clock, ArrowUpRight } from "lucide-react"
-import type { BlogPost } from "@/lib/blog"
+import { Clock, ArrowUpRight, Heart, MessageSquare } from "lucide-react"
+import type { BlogPost } from "@/lib/blog-types"
 import { useI18n } from "@/components/i18n-provider"
 
 // Category colours — consistent across blog components
@@ -16,6 +16,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
 }
 
 function formatDate(iso: string) {
+  if (!iso) return ""
   return new Date(iso).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })
 }
 
@@ -58,9 +59,19 @@ export function PostCard({ post }: { post: BlogPost }) {
       {/* Body */}
       <div className="flex flex-1 flex-col gap-2 p-5">
         {/* Date */}
-        <span className="text-[11px] font-medium text-muted-foreground">
-          {formatDate(post.publishedAt)}
-        </span>
+        <div className="flex items-center justify-between text-[11px] font-medium text-muted-foreground">
+          <span>{formatDate(post.publishedAt)}</span>
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex items-center gap-1 text-rose-500">
+              <Heart className="size-3 fill-rose-500/20" />
+              {post.likesCount ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1 text-primary">
+              <MessageSquare className="size-3" />
+              {post.comments?.length ?? 0}
+            </span>
+          </div>
+        </div>
 
         {/* Title */}
         <h3 className="font-serif text-[1.05rem] leading-snug text-foreground text-balance">

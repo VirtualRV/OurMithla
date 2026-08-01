@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Mail, Rss, Send } from "lucide-react"
+import { Mail } from "lucide-react"
 import { useI18n } from "@/components/i18n-provider"
 import type { TranslationKey } from "@/lib/i18n/translations"
 
@@ -18,7 +18,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-16 border-t border-border bg-secondary/50">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center rounded-full bg-primary font-serif text-lg text-primary-foreground">
@@ -61,39 +61,29 @@ export function SiteFooter() {
             ))}
           </ul>
         </div>
-
-        <div>
-          <h3 className="font-serif text-base text-foreground">{t("footer.follow.title")}</h3>
-          <div className="mt-3 flex items-center gap-3">
-            {[
-              { icon: Send, label: "Telegram" },
-              { icon: Mail, label: "Newsletter" },
-              { icon: Rss, label: "RSS feed" },
-            ].map(({ icon: Icon, label }) => (
-              <a
-                key={label}
-                href="#"
-                aria-label={label}
-                className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
-              >
-                <Icon className="size-4" />
-              </a>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">
-          © {year} {t("brand.name")}. {t("footer.rights")} Developed by{" "}
-          <a
-            href="https://hibousoft.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-primary transition-colors hover:text-primary/80"
-          >
-            Hibousoft
-          </a>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground sm:px-6">
+          <div>
+            © {year} {t("brand.name")}. {t("footer.rights")} Developed by{" "}
+            <a
+              href="https://hibousoft.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              Hibousoft
+            </a>
+          </div>
+          <div>
+            <Link
+              href="/admin"
+              className="text-muted-foreground/70 hover:text-primary transition-colors font-medium"
+            >
+              Admin Panel
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

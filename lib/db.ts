@@ -46,13 +46,13 @@ export function getPool(): Promise<sql.ConnectionPool> {
       },
     }
 
-    poolPromise = sql.connect(config).catch((err) => {
+    poolPromise = sql.connect(config).catch((err: unknown) => {
       poolPromise = null // allow retry on next call
       throw err
     })
   }
 
-  return poolPromise
+  return poolPromise!
 }
 
 export { sql }

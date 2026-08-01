@@ -34,7 +34,7 @@ declare global {
  */
 export function AdSlot({ slot, format = "auto", variant = "rectangle", className }: AdSlotProps) {
   const { t } = useI18n()
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
+  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-3653662664461490"
 
   useEffect(() => {
     if (!client) return

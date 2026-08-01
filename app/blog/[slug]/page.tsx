@@ -2,8 +2,10 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Clock, CalendarDays, User, Tag, ArrowRight } from "lucide-react"
+import { ArrowLeft, Clock, CalendarDays, User, Tag, ArrowRight, Heart, MessageSquare } from "lucide-react"
 import { getAllPosts, getPostBySlug } from "@/lib/blog"
+import { BlogInteractions } from "@/components/blog/blog-interactions"
+import { BlogTranslationWrapper } from "@/components/blog/blog-translation-wrapper"
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -37,6 +39,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
 }
 
 function formatDate(iso: string) {
+  if (!iso) return ""
   return new Date(iso).toLocaleDateString("en-IN", {
     year: "numeric",
     month: "long",
@@ -97,59 +100,30 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </div>
 
-      {/* ── Article ──────────────────────────────────────── */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
-        {/* Meta header — overlaps the hero */}
-        <div className="-mt-28 relative pb-8">
-          {/* Category badge */}
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${catColor.bg} ${catColor.text}`}
-          >
-            <Tag className="size-3" />
-            {post.category}
-          </span>
+        {/* ── Article Body with Dynamic Language Translation ── */}
+        <BlogTranslationWrapper
+          originalTitle={post.title}
+          originalExcerpt={post.excerpt}
+          originalParagraphs={paragraphs}
+          category={post.category}
+          author={post.author}
+          publishedAtFormatted={formatDate(post.publishedAt)}
+          readMinutes={post.readMinutes}
+          likesCount={post.likesCount ?? 0}
+          commentsCount={post.comments?.length ?? 0}
+          catColor={catColor}
+        />
 
-          {/* Title */}
-          <h1 className="mt-4 font-serif text-3xl leading-tight text-foreground text-balance sm:text-4xl lg:text-5xl">
-            {post.title}
-          </h1>
-
-          {/* Excerpt / sub-heading */}
-          <p className="mt-4 text-lg leading-relaxed text-muted-foreground text-pretty">
-            {post.excerpt}
-          </p>
-
-          {/* Meta bar */}
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-border pb-6 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <User className="size-4 shrink-0 text-primary" />
-              <span className="font-medium text-foreground">{post.author}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="size-4 shrink-0 text-primary" />
-              {formatDate(post.publishedAt)}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-4 shrink-0 text-primary" />
-              {post.readMinutes} min read
-            </span>
-          </div>
-        </div>
-
-        {/* Article body */}
-        <article className="prose-custom pb-16">
-          {paragraphs.map((para, i) => (
-            <p
-              key={i}
-              className="mb-6 text-base leading-[1.85] text-foreground/90 last:mb-0 sm:text-[1.05rem]"
-            >
-              {para}
-            </p>
-          ))}
-        </article>
+        {/* Interactive Likes & Comments */}
+        <BlogInteractions
+          postId={post.id}
+          initialLikes={post.likesCount ?? 0}
+          initialComments={post.comments || []}
+        />
 
         {/* Tags / share row */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 pb-16">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 pb-16 mt-8">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${catColor.bg} ${catColor.text}`}
           >
