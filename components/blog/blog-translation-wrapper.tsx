@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/components/i18n-provider"
 import { useBlogTranslation } from "@/lib/use-blog-translation"
-import { Globe, Languages, Loader2 } from "lucide-react"
+import { Globe, Languages, Loader2, FileText, ExternalLink, Download } from "lucide-react"
 import type { Locale } from "@/lib/i18n/translations"
 
 type Props = {
@@ -16,6 +16,8 @@ type Props = {
   likesCount: number
   commentsCount: number
   catColor: { bg: string; text: string }
+  pdfUrl?: string
+  pdfTitle?: string
   children?: React.ReactNode
 }
 
@@ -30,6 +32,8 @@ export function BlogTranslationWrapper({
   likesCount,
   commentsCount,
   catColor,
+  pdfUrl,
+  pdfTitle,
 }: Props) {
   const { locale, setLocale } = useI18n()
   const { title, excerpt, paragraphs, isTranslating } = useBlogTranslation(
@@ -109,6 +113,40 @@ export function BlogTranslationWrapper({
           <span>{commentsCount} comments</span>
         </div>
       </div>
+
+      {/* PDF Attachment Banner */}
+      {pdfUrl && (
+        <div className="mb-8 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-amber-500/5 to-muted p-5 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
+                <FileText className="size-6" />
+              </div>
+              <div>
+                <span className="inline-block rounded-md bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  Attached PDF Document
+                </span>
+                <h3 className="font-serif text-lg font-bold text-foreground mt-0.5">
+                  {pdfTitle || "Article Document Attachment"}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Click to open and read full PDF document in a new tab.
+                </p>
+              </div>
+            </div>
+
+            <a
+              href={pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 transition-all shrink-0"
+            >
+              <span>Open PDF in New Tab</span>
+              <ExternalLink className="size-3.5" />
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Article body */}
       <article className="prose-custom pb-8 transition-all">

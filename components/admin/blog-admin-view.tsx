@@ -20,16 +20,20 @@ import {
   Filter,
   ExternalLink,
   BookOpen,
+  BarChart3,
+  TrendingUp,
 } from "lucide-react"
 import type { BlogPost, BlogPostInput } from "@/lib/blog-types"
 import { CATEGORIES } from "@/lib/blog-types"
 import { BlogEditorModal } from "@/components/admin/blog-editor-modal"
+import { AnalyticsDashboard } from "@/components/admin/analytics-dashboard"
 
 type Props = {
   initialPosts: BlogPost[]
 }
 
 export function BlogAdminView({ initialPosts }: Props) {
+  const [activeTab, setActiveTab] = useState<"articles" | "analytics">("articles")
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("All")
@@ -150,15 +154,44 @@ export function BlogAdminView({ initialPosts }: Props) {
       {/* ── Top Bar ───────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-serif text-lg font-bold shadow-sm">
-              ॐ
-            </span>
-            <div>
-              <h1 className="font-serif text-lg font-bold leading-none text-foreground">
-                Blog Admin Panel
-              </h1>
-              <p className="text-xs text-muted-foreground">Manage OurMithila articles & publications</p>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground font-serif text-lg font-bold shadow-sm">
+                ॐ
+              </span>
+              <div className="hidden sm:block">
+                <h1 className="font-serif text-lg font-bold leading-none text-foreground">
+                  Admin Dashboard
+                </h1>
+                <p className="text-xs text-muted-foreground">Manage OurMithila articles & analytics</p>
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="flex items-center gap-1 rounded-2xl border border-border bg-muted/30 p-1">
+              <button
+                onClick={() => setActiveTab("articles")}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  activeTab === "articles"
+                    ? "bg-card text-primary shadow-xs border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <BookOpen className="size-3.5" />
+                <span>Articles ({posts.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("analytics")}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  activeTab === "analytics"
+                    ? "bg-card text-primary shadow-xs border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <BarChart3 className="size-3.5" />
+                <span>Analytics & Traffic</span>
+              </button>
             </div>
           </div>
 
@@ -169,7 +202,7 @@ export function BlogAdminView({ initialPosts }: Props) {
               className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition-colors"
             >
               <ExternalLink className="size-3.5 text-muted-foreground" />
-              <span>View Public Blog</span>
+              <span className="hidden sm:inline">View Public Blog</span>
             </Link>
 
             <button
@@ -185,6 +218,10 @@ export function BlogAdminView({ initialPosts }: Props) {
 
       {/* ── Main Content Container ───────────────────────── */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        {activeTab === "analytics" ? (
+          <AnalyticsDashboard />
+        ) : (
+          <>
         {/* ── Stat Summary Cards ─────────────────────────── */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -436,7 +473,9 @@ export function BlogAdminView({ initialPosts }: Props) {
             </div>
           )}
         </div>
-      </main>
+      </>
+    )}
+  </main>
 
       {/* ── Editor Modal ──────────────────────────────────── */}
       <BlogEditorModal

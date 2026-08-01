@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Sparkles, Image as ImageIcon, BookOpen, User, Tag, Clock, FileText, Check } from "lucide-react"
+import { X, Sparkles, Image as ImageIcon, BookOpen, User, Tag, Clock, FileText, Check, Upload, FileUp, ExternalLink, File } from "lucide-react"
 import type { BlogPost, BlogPostInput } from "@/lib/blog-types"
 import { CATEGORIES, slugify } from "@/lib/blog-types"
 
@@ -31,6 +31,10 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [autoSlug, setAutoSlug] = useState(true)
 
+  const [uploadingCover, setUploadingCover] = useState(false)
+  const [uploadingPdf, setUploadingPdf] = useState(false)
+  const [uploadingInline, setUploadingInline] = useState(false)
+
   useEffect(() => {
     if (post) {
       setFormData({
@@ -40,6 +44,8 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
         category: post.category,
         author: post.author,
         coverImage: post.coverImage,
+        pdfUrl: post.pdfUrl || "",
+        pdfTitle: post.pdfTitle || "",
         excerpt: post.excerpt,
         content: post.content,
         readMinutes: post.readMinutes,
@@ -55,6 +61,8 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
         category: "Art",
         author: "OurMithila Team",
         coverImage: "/images/blog-madhubani.png",
+        pdfUrl: "",
+        pdfTitle: "",
         excerpt: "",
         content: "",
         readMinutes: 5,
@@ -68,6 +76,71 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
   }, [post, isOpen])
 
   if (!isOpen) return null
+
+  async function handleFileUpload(file: File): Promise<string> {
+    const data = new FormData()
+    data.append("file", file)
+    const res = await fetch("/api/admin/upload", {
+      method: "POST",
+      body: data,
+    })
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}))
+      throw new Error(errJson.error || "Upload failed")
+    }
+    const result = await res.json()
+    return result.url
+  }
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingCover(true)
+    try {
+      const url = await handleFileUpload(file)
+      setFormData((prev) => ({ ...prev, coverImage: url }))
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setUploadingCover(false)
+    }
+  }
+
+  async function handlePdfUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingPdf(true)
+    try {
+      const url = await handleFileUpload(file)
+      setFormData((prev) => ({
+        ...prev,
+        pdfUrl: url,
+        pdfTitle: prev.pdfTitle || file.name,
+      }))
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setUploadingPdf(false)
+    }
+  }
+
+  async function handleInlineImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingInline(true)
+    try {
+      const url = await handleFileUpload(file)
+      const imageTag = `\n\n![${file.name}](${url})\n\n`
+      setFormData((prev) => ({
+        ...prev,
+        content: prev.content + imageTag,
+      }))
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setUploadingInline(false)
+    }
+  }
 
   function handleTitleChange(val: string) {
     setFormData((prev) => ({
@@ -234,18 +307,94 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
             </div>
           </div>
 
-          {/* Cover Image URL */}
+          {/* Cover Image Upload & URL */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1.5">
-              <ImageIcon className="size-3.5 text-primary" /> Cover Image URL
+            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <ImageIcon className="size-3.5 text-primary" /> Cover Image *
+              </span>
+              <span className="text-[11px] text-muted-foreground font-normal">Upload image file or paste URL</span>
             </label>
-            <input
-              type="text"
-              value={formData.coverImage}
-              onChange={(e) => setFormData((prev) => ({ ...prev, coverImage: e.target.value }))}
-              placeholder="/images/blog-madhubani.png or https://..."
-              className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm font-medium focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={formData.coverImage}
+                onChange={(e) => setFormData((prev) => ({ ...prev, coverImage: e.target.value }))}
+                placeholder="/images/blog-madhubani.png or https://..."
+                className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm font-medium focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              />
+              <label className="flex shrink-0 items-center gap-2 cursor-pointer rounded-xl bg-muted px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted/80 transition-colors border border-border">
+                {uploadingCover ? (
+                  <span className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                ) : (
+                  <Upload className="size-4 text-primary" />
+                )}
+                <span>Upload</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverUpload}
+                  disabled={uploadingCover}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* PDF Attachment Section */}
+          <div className="rounded-2xl border border-border bg-muted/20 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <File className="size-3.5 text-primary" /> Optional PDF Document Attachment
+              </label>
+              {formData.pdfUrl && (
+                <a
+                  href={formData.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                >
+                  Preview PDF <ExternalLink className="size-3" />
+                </a>
+              )}
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <input
+                  type="text"
+                  value={formData.pdfTitle || ""}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, pdfTitle: e.target.value }))}
+                  placeholder="PDF Title (e.g. Mithila Cultural Guide 2026.pdf)"
+                  className="w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm font-medium focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={formData.pdfUrl || ""}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, pdfUrl: e.target.value }))}
+                  placeholder="PDF File URL or upload below"
+                  className="w-full rounded-xl border border-input bg-background px-3.5 py-2 text-sm font-medium focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+                <label className="flex shrink-0 items-center gap-1.5 cursor-pointer rounded-xl bg-primary/10 px-3.5 py-2 text-sm font-medium text-primary hover:bg-primary/20 transition-colors border border-primary/20">
+                  {uploadingPdf ? (
+                    <span className="size-3.5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  ) : (
+                    <FileUp className="size-3.5" />
+                  )}
+                  <span>Upload PDF</span>
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handlePdfUpload}
+                    disabled={uploadingPdf}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
 
           {/* Excerpt */}
@@ -265,14 +414,31 @@ export function BlogEditorModal({ isOpen, onClose, onSave, post }: Props) {
 
           {/* Content */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
-              Article Content * (Paragraphs separated by double line breaks)
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Article Content * (Paragraphs separated by double line breaks)
+              </label>
+              <label className="flex items-center gap-1 text-[11px] font-medium text-primary cursor-pointer hover:underline">
+                {uploadingInline ? (
+                  <span className="size-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                ) : (
+                  <ImageIcon className="size-3" />
+                )}
+                <span>Insert Image in Article</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleInlineImageUpload}
+                  disabled={uploadingInline}
+                  className="hidden"
+                />
+              </label>
+            </div>
             <textarea
               rows={8}
               value={formData.content}
               onChange={(e) => handleContentChange(e.target.value)}
-              placeholder="Write the article content here..."
+              placeholder="Write the article content here... You can also click 'Insert Image in Article' above to add images within paragraphs!"
               required
               className="w-full rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm font-medium leading-relaxed focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />

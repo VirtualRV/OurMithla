@@ -7,6 +7,7 @@ import { I18nProvider } from '@/components/i18n-provider'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -86,6 +87,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <AnalyticsTracker />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

@@ -18,6 +18,8 @@ export type BlogPost = {
   isPublished: boolean
   readMinutes: number
   publishedAt: string // ISO date string YYYY-MM-DD
+  pdfUrl?: string
+  pdfTitle?: string
   likesCount?: number
   comments?: BlogComment[]
 }

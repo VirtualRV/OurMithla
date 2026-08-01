@@ -231,6 +231,8 @@ export async function createPost(input: BlogPostInput): Promise<BlogPost> {
     category: input.category,
     author: input.author,
     coverImage: input.coverImage || "/placeholder.jpg",
+    pdfUrl: input.pdfUrl || undefined,
+    pdfTitle: input.pdfTitle || undefined,
     featured,
     isPublished,
     readMinutes,
@@ -258,6 +260,8 @@ export async function updatePost(id: number, input: Partial<BlogPostInput>): Pro
   const category = input.category ?? existing.category
   const author = input.author ?? existing.author
   const coverImage = input.coverImage ?? existing.coverImage
+  const pdfUrl = input.pdfUrl !== undefined ? input.pdfUrl : existing.pdfUrl
+  const pdfTitle = input.pdfTitle !== undefined ? input.pdfTitle : existing.pdfTitle
   const featured = input.featured !== undefined ? Boolean(input.featured) : existing.featured
   const isPublished = input.isPublished !== undefined ? Boolean(input.isPublished) : existing.isPublished
   const readMinutes = computeReadMinutes(content)
@@ -272,6 +276,8 @@ export async function updatePost(id: number, input: Partial<BlogPostInput>): Pro
     category,
     author,
     coverImage,
+    pdfUrl,
+    pdfTitle,
     featured,
     isPublished,
     readMinutes,

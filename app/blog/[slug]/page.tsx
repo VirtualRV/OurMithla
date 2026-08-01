@@ -113,6 +113,8 @@ export default async function BlogPostPage({ params }: Props) {
           likesCount={post.likesCount ?? 0}
           commentsCount={post.comments?.length ?? 0}
           catColor={catColor}
+          pdfUrl={post.pdfUrl}
+          pdfTitle={post.pdfTitle}
         />
 
         {/* Interactive Likes & Comments */}
