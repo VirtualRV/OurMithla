@@ -27,14 +27,22 @@ jobs:
       - name: Fast Deploy to IIS Folder
         shell: powershell
         run: |
-          Import-Module WebAdministration
+          try {
+              Import-Module WebAdministration -ErrorAction SilentlyContinue
+          } catch {}
 
           # ── Configure IIS Website / AppPool Name and Target Folder Path ──
           $websiteName = "OurMithla"
           $targetFolder = "C:\inetpub\wwwroot\ourmithla"
 
-          # Stop AppPool to unlock files before sync
-          Stop-WebAppPool -Name $websiteName -ErrorAction SilentlyContinue
+          # Safely stop AppPool if it exists
+          try {
+              if (Test-Path "IIS:\AppPools\$websiteName") {
+                  Stop-WebAppPool -Name $websiteName -ErrorAction SilentlyContinue
+              }
+          } catch {
+              Write-Host "AppPool check skipped or AppPool not found. Continuing build copy..."
+          }
 
           # Ensure target directory exists
           if (!(Test-Path -Path $targetFolder)) {
@@ -62,8 +70,14 @@ jobs:
           Copy-Item -Path "package.json" -Destination "$targetFolder\package.json" -Force
           Copy-Item -Path "package-lock.json" -Destination "$targetFolder\package-lock.json" -Force
 
+          # Safely start AppPool if it exists
+          try {
+              if (Test-Path "IIS:\AppPools\$websiteName") {
+                  Start-WebAppPool -Name $websiteName -ErrorAction SilentlyContinue
+              }
+          } catch {
+              Write-Host "AppPool start skipped."
+          }
+
           # Ensure exit code is 0
           $global:LASTEXITCODE = 0
-
-          # Restart AppPool to serve the new build
-          Start-WebAppPool -Name $websiteName -ErrorAction SilentlyContinue
