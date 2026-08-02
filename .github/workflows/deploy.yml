@@ -42,11 +42,20 @@ jobs:
               New-Item -ItemType Directory -Force -Path $targetFolder
           }
 
-          # Fast multi-threaded sync using native Windows robocopy (50x faster than Copy-Item for node_modules)
-          robocopy ".next" "$targetFolder\.next" /MIR /MT:16 /NP /NFL /NDL /NJH /NJS
-          robocopy "public" "$targetFolder\public" /MIR /MT:16 /NP /NFL /NDL /NJH /NJS
-          robocopy "data" "$targetFolder\data" /MIR /MT:16 /NP /NFL /NDL /NJH /NJS
-          robocopy "node_modules" "$targetFolder\node_modules" /MIR /MT:16 /NP /NFL /NDL /NJH /NJS
+          # Helper function for Robocopy (Robocopy returns 1-7 for successful copy status)
+          function Sync-Folder {
+              param([string]$Src, [string]$Dest)
+              & robocopy $Src $Dest /MIR /MT:16 /NP /NFL /NDL /NJH /NJS
+              if ($LASTEXITCODE -le 7) {
+                  $global:LASTEXITCODE = 0
+              }
+          }
+
+          # Fast multi-threaded sync
+          Sync-Folder ".next" "$targetFolder\.next"
+          Sync-Folder "public" "$targetFolder\public"
+          Sync-Folder "data" "$targetFolder\data"
+          Sync-Folder "node_modules" "$targetFolder\node_modules"
 
           # Single file copies
           Copy-Item -Path "server.js" -Destination "$targetFolder\server.js" -Force
@@ -54,7 +63,7 @@ jobs:
           Copy-Item -Path "package.json" -Destination "$targetFolder\package.json" -Force
           Copy-Item -Path "package-lock.json" -Destination "$targetFolder\package-lock.json" -Force
 
-          # Reset exit code (robocopy uses 1-7 for successful copy status)
+          # Ensure exit code is 0
           $global:LASTEXITCODE = 0
 
           # Restart AppPool to serve the new build
