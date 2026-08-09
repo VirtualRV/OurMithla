@@ -8,6 +8,8 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
+import { PwaRegister } from '@/components/pwa-register'
+import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,6 +26,7 @@ const marcellus = Marcellus({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ourmithla.com'),
+  applicationName: 'OurMithla',
   title: {
     default: 'OurMithla | Culture, Almanac & Community of Mithila',
     template: '%s | OurMithla',
@@ -31,6 +34,14 @@ export const metadata: Metadata = {
   description:
     'OurMithla celebrates the living heritage of Mithila — cultural stories, festivals, Madhubani art, and the daily Hindu Panchang, in English, Hindi, and Maithili.',
   keywords: ['Mithila', 'Panchang', 'Madhubani Art', 'Hindu Calendar', 'Maithili', 'Festivals'],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'OurMithla',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   other: {
     'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-3653662664461490',
   },
@@ -86,6 +97,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <PwaRegister />
         <AnalyticsTracker />
         <ThemeProvider
           attribute="class"
@@ -98,6 +110,7 @@ export default function RootLayout({
             <div className="min-h-[calc(100vh-4rem)]">{children}</div>
             <SiteFooter />
           </I18nProvider>
+          <PwaInstallPrompt />
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
