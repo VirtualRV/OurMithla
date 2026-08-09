@@ -27,6 +27,7 @@ const marcellus = Marcellus({
 export const metadata: Metadata = {
   metadataBase: new URL('https://ourmithla.com'),
   applicationName: 'OurMithla',
+  manifest: '/manifest.json',
   title: {
     default: 'OurMithla | Culture, Almanac & Community of Mithila',
     template: '%s | OurMithla',
