@@ -1,5 +1,24 @@
 [
   {
+    "id": 7,
+    "slug": "test-community-story",
+    "title": "Test Community Story",
+    "excerpt": "A short test excerpt for approval flow.",
+    "content": "This is a community submitted article about Mithila culture waiting for admin approval.\n\nSecond paragraph.",
+    "category": "Heritage",
+    "author": "Test User",
+    "coverImage": "/placeholder.jpg",
+    "featured": false,
+    "isPublished": true,
+    "readMinutes": 1,
+    "publishedAt": "2026-08-10",
+    "likesCount": 0,
+    "comments": [],
+    "approvalStatus": "approved",
+    "submitterEmail": "test@example.com",
+    "isUserSubmission": true
+  },
+  {
     "id": 1,
     "slug": "timeless-art-of-madhubani-painting",
     "title": "The Timeless Art of Madhubani Painting",

@@ -25,6 +25,7 @@ export const translations = {
     "nav.blog": "Blog",
     "nav.panchang": "Panchang",
     "nav.contact": "Contact",
+    "nav.submit": "Write",
     "nav.language": "Language",
 
     "home.hero.eyebrow": "Welcome to OurMithla",
@@ -97,6 +98,29 @@ export const translations = {
 
     "ad.label": "Advertisement",
 
+    "submit.notice":
+      "Your article will be sent to the admin for review. It will appear on the blog only after approval.",
+    "submit.successTitle": "Submitted for review",
+    "submit.successDesc":
+      "Thank you! An admin will review your article and publish it if it fits OurMithla.",
+    "submit.another": "Submit another article",
+    "submit.form.title": "Title",
+    "submit.form.titlePlaceholder": "e.g. Memories of Chhath in my village",
+    "submit.form.category": "Category",
+    "submit.form.author": "Your name",
+    "submit.form.authorPlaceholder": "Display name as author",
+    "submit.form.email": "Email",
+    "submit.form.emailPlaceholder": "you@example.com",
+    "submit.form.cover": "Cover image",
+    "submit.form.coverHint": "Optional — upload or paste a URL",
+    "submit.form.upload": "Upload",
+    "submit.form.excerpt": "Short summary",
+    "submit.form.excerptPlaceholder": "A short teaser for the blog card…",
+    "submit.form.content": "Article content",
+    "submit.form.contentPlaceholder": "Write your article here. Separate paragraphs with a blank line.",
+    "submit.form.submit": "Submit for approval",
+    "submit.form.submitting": "Submitting…",
+
     "footer.about.title": "About OurMithla",
     "footer.about.desc":
       "A cultural home for the people of Mithila — preserving heritage and serving the community.",
@@ -115,6 +139,7 @@ export const translations = {
     "nav.blog": "ब्लॉग",
     "nav.panchang": "पंचांग",
     "nav.contact": "संपर्क",
+    "nav.submit": "लिखें",
     "nav.language": "भाषा",
 
     "home.hero.eyebrow": "अवरमिथिला में आपका स्वागत है",
@@ -187,6 +212,29 @@ export const translations = {
 
     "ad.label": "विज्ञापन",
 
+    "submit.notice":
+      "आपका लेख समीक्षा के लिए एडमिन को भेजा जाएगा। स्वीकृति के बाद ही यह ब्लॉग पर दिखेगा।",
+    "submit.successTitle": "समीक्षा के लिए जमा",
+    "submit.successDesc":
+      "धन्यवाद! एडमिन आपके लेख की समीक्षा करेगा और उपयुक्त होने पर प्रकाशित करेगा।",
+    "submit.another": "एक और लेख जमा करें",
+    "submit.form.title": "शीर्षक",
+    "submit.form.titlePlaceholder": "उदा. मेरे गाँव में छठ की यादें",
+    "submit.form.category": "श्रेणी",
+    "submit.form.author": "आपका नाम",
+    "submit.form.authorPlaceholder": "लेखक के रूप में दिखने वाला नाम",
+    "submit.form.email": "ईमेल",
+    "submit.form.emailPlaceholder": "you@example.com",
+    "submit.form.cover": "कवर छवि",
+    "submit.form.coverHint": "वैकल्पिक — अपलोड करें या URL डालें",
+    "submit.form.upload": "अपलोड",
+    "submit.form.excerpt": "संक्षिप्त सार",
+    "submit.form.excerptPlaceholder": "ब्लॉग कार्ड के लिए छोटा परिचय…",
+    "submit.form.content": "लेख सामग्री",
+    "submit.form.contentPlaceholder": "यहाँ अपना लेख लिखें। पैराग्राफ खाली पंक्ति से अलग करें।",
+    "submit.form.submit": "अनुमोदन के लिए जमा करें",
+    "submit.form.submitting": "जमा हो रहा है…",
+
     "footer.about.title": "अवरमिथिला के बारे में",
     "footer.about.desc":
       "मिथिला के लोगों का सांस्कृतिक घर — विरासत का संरक्षण और समुदाय की सेवा।",
@@ -205,6 +253,7 @@ export const translations = {
     "nav.blog": "ब्लॉग",
     "nav.panchang": "पंचांग",
     "nav.contact": "संपर्क",
+    "nav.submit": "लिखू",
     "nav.language": "भाषा",
 
     "home.hero.eyebrow": "अपन मिथिला मे अहाँक स्वागत अछि",
@@ -276,6 +325,29 @@ export const translations = {
     "contact.info.location": "मिथिला (बिहार, भारत आ मधेश, नेपाल)",
 
     "ad.label": "विज्ञापन",
+
+    "submit.notice":
+      "अहाँक आलेख समीक्षा लेल एडमिन केँ पठाओल जायत। स्वीकृतिक बादहि ई ब्लॉग पर देखायत।",
+    "submit.successTitle": "समीक्षा लेल जमा",
+    "submit.successDesc":
+      "धन्यवाद! एडमिन अहाँक आलेखक समीक्षा करत आ उपयुक्त होइत प्रकाशित करत।",
+    "submit.another": "आओर एक आलेख जमा करू",
+    "submit.form.title": "शीर्षक",
+    "submit.form.titlePlaceholder": "उदा. हमर गाँव मे छठक याद",
+    "submit.form.category": "श्रेणी",
+    "submit.form.author": "अहाँक नाम",
+    "submit.form.authorPlaceholder": "लेखक रूप मे देखाय बला नाम",
+    "submit.form.email": "ईमेल",
+    "submit.form.emailPlaceholder": "you@example.com",
+    "submit.form.cover": "कवर छवि",
+    "submit.form.coverHint": "वैकल्पिक — अपलोड करू वा URL दिअ",
+    "submit.form.upload": "अपलोड",
+    "submit.form.excerpt": "संक्षिप्त सार",
+    "submit.form.excerptPlaceholder": "ब्लॉग कार्ड लेल छोट परिचय…",
+    "submit.form.content": "आलेख सामग्री",
+    "submit.form.contentPlaceholder": "एतय अपन आलेख लिखू। पैराग्राफ खाली पंक्ति सँ अलग करू।",
+    "submit.form.submit": "अनुमोदन लेल जमा करू",
+    "submit.form.submitting": "जमा भ' रहल अछि…",
 
     "footer.about.title": "अपन मिथिलाक बारे मे",
     "footer.about.desc":

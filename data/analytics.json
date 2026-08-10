@@ -1,42 +1,10 @@
 [
   {
-    "sessionId": "sess_1785591795900_jqnv2t",
-    "path": "/blog/chhath-puja-great-festival-of-the-sun",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-01T13:43:31.723Z",
-    "durationSeconds": 17
-  },
-  {
-    "sessionId": "sess_1785591795900_jqnv2t",
-    "path": "/contact",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-01T13:43:26.145Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1785591795900_jqnv2t",
-    "path": "/panchang",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-01T13:43:24.689Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1785591795900_jqnv2t",
-    "path": "/blog",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-01T13:43:21.334Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1785591795900_jqnv2t",
+    "sessionId": "sess_1786387044199_f32xaa",
     "path": "/",
     "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-01T13:43:16.354Z",
-    "durationSeconds": 60
+    "device": "Mobile",
+    "timestamp": "2026-08-10T18:42:50.148Z",
+    "durationSeconds": 160
   }
 ]

@@ -5,6 +5,8 @@ export type BlogComment = {
   createdAt: string
 }
 
+export type ApprovalStatus = "pending" | "approved" | "rejected"
+
 export type BlogPost = {
   id: number
   slug: string
@@ -22,6 +24,10 @@ export type BlogPost = {
   pdfTitle?: string
   likesCount?: number
   comments?: BlogComment[]
+  /** Community submissions start as "pending" until an admin approves. */
+  approvalStatus?: ApprovalStatus
+  submitterEmail?: string
+  isUserSubmission?: boolean
 }
 
 export type BlogPostInput = Omit<BlogPost, "id"> & { id?: number }

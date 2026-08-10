@@ -186,10 +186,16 @@ function processPost(p: BlogPost): BlogPost {
   }
 }
 
-/** Fetch all published posts, newest first. */
+function isPubliclyVisible(p: BlogPost): boolean {
+  if (p.isPublished === false) return false
+  if (p.approvalStatus === "pending" || p.approvalStatus === "rejected") return false
+  return true
+}
+
+/** Fetch all published + approved posts, newest first. */
 export async function getAllPosts(): Promise<BlogPost[]> {
   const posts = await readJsonPosts()
-  return sortByDate(posts.filter((p) => p.isPublished !== false).map(processPost))
+  return sortByDate(posts.filter(isPubliclyVisible).map(processPost))
 }
 
 /** Fetch ALL posts (published and drafts) for admin dashboard */
@@ -201,7 +207,7 @@ export async function getAllAdminPosts(): Promise<BlogPost[]> {
 /** Fetch a single post by slug. */
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   const posts = await readJsonPosts()
-  const post = posts.find((p) => p.slug === slug && p.isPublished !== false)
+  const post = posts.find((p) => p.slug === slug && isPubliclyVisible(p))
   return post ? processPost(post) : null
 }
 
@@ -212,15 +218,32 @@ export async function getPostById(id: number): Promise<BlogPost | null> {
   return post ? processPost(post) : null
 }
 
+/** Create a unique slug if the preferred one already exists. */
+async function uniqueSlug(preferred: string, posts: BlogPost[]): Promise<string> {
+  let slug = preferred
+  let n = 2
+  while (posts.some((p) => p.slug === slug)) {
+    slug = `${preferred}-${n}`
+    n += 1
+  }
+  return slug
+}
+
 /** Create a new blog post */
 export async function createPost(input: BlogPostInput): Promise<BlogPost> {
-  const slug = input.slug ? slugify(input.slug) : slugify(input.title)
+  const preferredSlug = input.slug ? slugify(input.slug) : slugify(input.title)
   const publishedAt = input.publishedAt || new Date().toISOString().slice(0, 10)
   const readMinutes = computeReadMinutes(input.content)
   const featured = Boolean(input.featured)
-  const isPublished = input.isPublished !== undefined ? Boolean(input.isPublished) : true
+  const isUserSubmission = Boolean(input.isUserSubmission)
+  const approvalStatus = input.approvalStatus ?? (isUserSubmission ? "pending" : "approved")
+  const isPublished =
+    input.isPublished !== undefined
+      ? Boolean(input.isPublished)
+      : approvalStatus === "approved"
 
   const posts = await readJsonPosts()
+  const slug = await uniqueSlug(preferredSlug, posts)
   const maxId = posts.reduce((max, p) => (p.id > max ? p.id : max), 0)
   const newPost: BlogPost = {
     id: maxId + 1,
@@ -239,11 +262,47 @@ export async function createPost(input: BlogPostInput): Promise<BlogPost> {
     publishedAt,
     likesCount: 0,
     comments: [],
+    approvalStatus,
+    submitterEmail: input.submitterEmail || undefined,
+    isUserSubmission: isUserSubmission || undefined,
   }
 
   posts.unshift(newPost)
   await writeJsonPosts(posts)
   return newPost
+}
+
+/** Community user submission — always pending until admin approves. */
+export async function submitUserPost(
+  input: Omit<BlogPostInput, "isPublished" | "featured" | "approvalStatus" | "isUserSubmission"> & {
+    submitterEmail: string
+  },
+): Promise<BlogPost> {
+  return createPost({
+    ...input,
+    featured: false,
+    isPublished: false,
+    isUserSubmission: true,
+    approvalStatus: "pending",
+  })
+}
+
+/** Approve a pending submission and publish it. */
+export async function approvePost(id: number): Promise<BlogPost | null> {
+  return updatePost(id, {
+    approvalStatus: "approved",
+    isPublished: true,
+    publishedAt: new Date().toISOString().slice(0, 10),
+  })
+}
+
+/** Reject a pending submission (stays unpublished). */
+export async function rejectPost(id: number): Promise<BlogPost | null> {
+  return updatePost(id, {
+    approvalStatus: "rejected",
+    isPublished: false,
+    featured: false,
+  })
 }
 
 /** Update an existing blog post */
@@ -266,6 +325,12 @@ export async function updatePost(id: number, input: Partial<BlogPostInput>): Pro
   const isPublished = input.isPublished !== undefined ? Boolean(input.isPublished) : existing.isPublished
   const readMinutes = computeReadMinutes(content)
   const publishedAt = input.publishedAt ?? existing.publishedAt
+  const approvalStatus =
+    input.approvalStatus !== undefined ? input.approvalStatus : existing.approvalStatus
+  const submitterEmail =
+    input.submitterEmail !== undefined ? input.submitterEmail : existing.submitterEmail
+  const isUserSubmission =
+    input.isUserSubmission !== undefined ? input.isUserSubmission : existing.isUserSubmission
 
   const updated: BlogPost = {
     ...existing,
@@ -282,6 +347,9 @@ export async function updatePost(id: number, input: Partial<BlogPostInput>): Pro
     isPublished,
     readMinutes,
     publishedAt,
+    approvalStatus,
+    submitterEmail,
+    isUserSubmission,
   }
 
   posts[index] = updated

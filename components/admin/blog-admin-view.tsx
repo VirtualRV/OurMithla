@@ -17,11 +17,11 @@ import {
   FileText,
   CheckCircle2,
   Clock,
-  Filter,
   ExternalLink,
   BookOpen,
   BarChart3,
-  TrendingUp,
+  Check,
+  XCircle,
 } from "lucide-react"
 import type { BlogPost, BlogPostInput } from "@/lib/blog-types"
 import { CATEGORIES } from "@/lib/blog-types"
@@ -56,8 +56,10 @@ export function BlogAdminView({ initialPosts }: Props) {
     const matchesCategory = categoryFilter === "All" || post.category === categoryFilter
     const matchesStatus =
       statusFilter === "All" ||
-      (statusFilter === "Published" && post.isPublished) ||
-      (statusFilter === "Drafts" && !post.isPublished) ||
+      (statusFilter === "Published" && post.isPublished && post.approvalStatus !== "pending") ||
+      (statusFilter === "Drafts" && !post.isPublished && post.approvalStatus !== "pending") ||
+      (statusFilter === "Pending" && post.approvalStatus === "pending") ||
+      (statusFilter === "Rejected" && post.approvalStatus === "rejected") ||
       (statusFilter === "Featured" && post.featured)
 
     return matchesSearch && matchesCategory && matchesStatus
@@ -65,8 +67,13 @@ export function BlogAdminView({ initialPosts }: Props) {
 
   // Stats calculation
   const totalCount = posts.length
-  const publishedCount = posts.filter((p) => p.isPublished).length
-  const draftCount = totalCount - publishedCount
+  const publishedCount = posts.filter(
+    (p) => p.isPublished && p.approvalStatus !== "pending" && p.approvalStatus !== "rejected",
+  ).length
+  const pendingCount = posts.filter((p) => p.approvalStatus === "pending").length
+  const draftCount = posts.filter(
+    (p) => !p.isPublished && p.approvalStatus !== "pending",
+  ).length
   const featuredCount = posts.filter((p) => p.featured).length
 
   async function handleLogout() {
@@ -111,10 +118,15 @@ export function BlogAdminView({ initialPosts }: Props) {
   async function handleTogglePublish(post: BlogPost) {
     setLoading(true)
     try {
+      const nextPublished = !post.isPublished
       const res = await fetch(`/api/admin/blog/${post.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isPublished: !post.isPublished }),
+        body: JSON.stringify({
+          isPublished: nextPublished,
+          // Publishing always clears pending/rejected so the post can go live.
+          approvalStatus: nextPublished ? "approved" : post.approvalStatus === "pending" ? "pending" : post.approvalStatus,
+        }),
       })
       if (res.ok) await fetchPosts()
     } finally {
@@ -129,6 +141,34 @@ export function BlogAdminView({ initialPosts }: Props) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ featured: !post.featured }),
+      })
+      if (res.ok) await fetchPosts()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleApprove(post: BlogPost) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/blog/${post.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "approve" }),
+      })
+      if (res.ok) await fetchPosts()
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleReject(post: BlogPost) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/blog/${post.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reject" }),
       })
       if (res.ok) await fetchPosts()
     } finally {
@@ -223,7 +263,7 @@ export function BlogAdminView({ initialPosts }: Props) {
         ) : (
           <>
         {/* ── Stat Summary Cards ─────────────────────────── */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total Posts</p>
@@ -244,13 +284,27 @@ export function BlogAdminView({ initialPosts }: Props) {
             </div>
           </div>
 
+          <button
+            type="button"
+            onClick={() => setStatusFilter("Pending")}
+            className="flex items-center justify-between rounded-2xl border border-sky-500/20 bg-sky-500/5 p-5 shadow-sm text-left transition-colors hover:bg-sky-500/10"
+          >
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">Pending Review</p>
+              <h3 className="mt-1 font-serif text-3xl font-bold text-sky-700 dark:text-sky-400">{pendingCount}</h3>
+            </div>
+            <div className="flex size-11 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+              <Clock className="size-5" />
+            </div>
+          </button>
+
           <div className="flex items-center justify-between rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 shadow-sm">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">Drafts</p>
               <h3 className="mt-1 font-serif text-3xl font-bold text-amber-700 dark:text-amber-400">{draftCount}</h3>
             </div>
             <div className="flex size-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <Clock className="size-5" />
+              <FileText className="size-5" />
             </div>
           </div>
 
@@ -304,8 +358,10 @@ export function BlogAdminView({ initialPosts }: Props) {
                 className="rounded-xl border border-input bg-card px-3.5 py-2 text-sm font-medium text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option value="All">All Statuses</option>
+                <option value="Pending">Pending Approval</option>
                 <option value="Published">Published Only</option>
                 <option value="Drafts">Drafts Only</option>
+                <option value="Rejected">Rejected</option>
                 <option value="Featured">Featured Only</option>
               </select>
             </div>
@@ -393,22 +449,37 @@ export function BlogAdminView({ initialPosts }: Props) {
 
                       {/* Status */}
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              post.isPublished
-                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
-                                : "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
-                            }`}
-                          >
-                            {post.isPublished ? "Published" : "Draft"}
-                          </span>
-
-                          {post.featured && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">
-                              <Star className="size-3 fill-purple-600 dark:fill-purple-300" />
-                              Featured
+                        <div className="flex flex-col items-start gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                post.approvalStatus === "pending"
+                                  ? "bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-300"
+                                  : post.approvalStatus === "rejected"
+                                    ? "bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
+                                    : post.isPublished
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+                                      : "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                              }`}
+                            >
+                              {post.approvalStatus === "pending"
+                                ? "Pending"
+                                : post.approvalStatus === "rejected"
+                                  ? "Rejected"
+                                  : post.isPublished
+                                    ? "Published"
+                                    : "Draft"}
                             </span>
+
+                            {post.featured && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">
+                                <Star className="size-3 fill-purple-600 dark:fill-purple-300" />
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          {post.isUserSubmission && post.submitterEmail && (
+                            <span className="text-[11px] text-muted-foreground">{post.submitterEmail}</span>
                           )}
                         </div>
                       </td>
@@ -416,10 +487,31 @@ export function BlogAdminView({ initialPosts }: Props) {
                       {/* Actions */}
                       <td className="px-6 py-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
+                          {post.approvalStatus === "pending" && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(post)}
+                                disabled={loading}
+                                title="Approve & Publish"
+                                className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                              >
+                                <Check className="size-4" />
+                              </button>
+                              <button
+                                onClick={() => handleReject(post)}
+                                disabled={loading}
+                                title="Reject Submission"
+                                className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                              >
+                                <XCircle className="size-4" />
+                              </button>
+                            </>
+                          )}
+
                           {/* Toggle Publish */}
                           <button
                             onClick={() => handleTogglePublish(post)}
-                            disabled={loading}
+                            disabled={loading || post.approvalStatus === "pending"}
                             title={post.isPublished ? "Unpublish (Move to Draft)" : "Publish Article"}
                             className={`p-2 rounded-lg transition-colors ${
                               post.isPublished

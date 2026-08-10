@@ -3,8 +3,10 @@
 import { useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/components/i18n-provider"
+import { ADSENSE_CLIENT, resolveAdSlotId } from "@/lib/adsense"
 
 type AdSlotProps = {
+  /** Named placement key (e.g. "home-mid") or a raw numeric AdSense slot id. */
   slot?: string
   format?: string
   /** Visual size preset for the placeholder box. */
@@ -28,22 +30,25 @@ declare global {
 /**
  * AdSense slot.
  *
- * When NEXT_PUBLIC_ADSENSE_CLIENT is set, renders a real <ins class="adsbygoogle">
- * unit (the AdSense script is loaded once in the root layout). Otherwise it shows a
- * styled placeholder so the layout stays intact during development.
+ * Renders a real <ins class="adsbygoogle"> unit only when a numeric AdSense
+ * slot id is configured (via env mapping or a raw numeric `slot` prop).
+ * Otherwise shows a layout placeholder — fake string ids like "home-mid"
+ * are NOT valid AdSense slots and will not fill.
  */
 export function AdSlot({ slot, format = "auto", variant = "rectangle", className }: AdSlotProps) {
   const { t } = useI18n()
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-3653662664461490"
+  const client = ADSENSE_CLIENT
+  const resolvedSlot = resolveAdSlotId(slot)
+  const canServe = Boolean(client && resolvedSlot)
 
   useEffect(() => {
-    if (!client) return
+    if (!canServe) return
     try {
       ;(window.adsbygoogle = window.adsbygoogle || []).push({})
     } catch {
       // AdSense not ready yet — ignore.
     }
-  }, [client])
+  }, [canServe, resolvedSlot])
 
   return (
     <aside
@@ -54,12 +59,12 @@ export function AdSlot({ slot, format = "auto", variant = "rectangle", className
         className,
       )}
     >
-      {client && slot ? (
+      {canServe ? (
         <ins
           className="adsbygoogle block w-full"
           style={{ display: "block" }}
           data-ad-client={client}
-          data-ad-slot={slot}
+          data-ad-slot={resolvedSlot}
           data-ad-format={format}
           data-full-width-responsive="true"
         />
@@ -69,6 +74,12 @@ export function AdSlot({ slot, format = "auto", variant = "rectangle", className
             {t("ad.label")}
           </span>
           <span className="text-xs text-muted-foreground/60">Google AdSense</span>
+          {process.env.NODE_ENV === "development" && (
+            <span className="mt-1 max-w-xs text-[10px] leading-relaxed text-muted-foreground/50">
+              Set a numeric slot id for “{slot || "this placement"}” in .env.local
+              (see .env.example). Fake labels like home-mid will not fill.
+            </span>
+          )}
         </div>
       )}
     </aside>

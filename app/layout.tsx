@@ -1,6 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
 import { Inter, Marcellus } from 'next/font/google'
 import './globals.css'
 import { I18nProvider } from '@/components/i18n-provider'
@@ -10,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
+import { ADSENSE_CLIENT } from '@/lib/adsense'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   other: {
-    'google-adsense-account': process.env.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-3653662664461490',
+    'google-adsense-account': ADSENSE_CLIENT,
   },
   openGraph: {
     type: 'website',
@@ -86,14 +86,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-3653662664461490"
-
   return (
     <html lang="en" suppressHydrationWarning className={`bg-background ${inter.variable} ${marcellus.variable}`}>
       <head>
+        {/* Plain script tag — next/script adds data-nscript which AdSense rejects */}
         <script
           async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
         />
       </head>

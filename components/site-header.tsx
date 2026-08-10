@@ -14,6 +14,7 @@ const NAV: { href: string; key: TranslationKey }[] = [
   { href: "/", key: "nav.home" },
   { href: "/blog", key: "nav.blog" },
   { href: "/panchang", key: "nav.panchang" },
+  { href: "/submit", key: "nav.submit" },
   { href: "/contact", key: "nav.contact" },
 ]
 

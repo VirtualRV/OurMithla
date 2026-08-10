@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { updatePost, deletePost, getPostById } from "@/lib/blog"
+import { updatePost, deletePost, getPostById, approvePost, rejectPost } from "@/lib/blog"
 
 async function checkAuth(): Promise<boolean> {
   const cookieStore = await cookies()
@@ -42,6 +42,19 @@ export async function PUT(request: Request, { params }: Props) {
 
   try {
     const body = await request.json()
+
+    if (body.action === "approve") {
+      const updated = await approvePost(numId)
+      if (!updated) return NextResponse.json({ error: "Post not found" }, { status: 404 })
+      return NextResponse.json(updated)
+    }
+
+    if (body.action === "reject") {
+      const updated = await rejectPost(numId)
+      if (!updated) return NextResponse.json({ error: "Post not found" }, { status: 404 })
+      return NextResponse.json(updated)
+    }
+
     const updated = await updatePost(numId, body)
     if (!updated) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
