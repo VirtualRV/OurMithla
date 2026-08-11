@@ -22,6 +22,10 @@ jobs:
         run: npm ci
 
       - name: Build Next.js Production Release
+        env:
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LfG9lktAAAAAN4TR70L0HLd_QG3U-2Z9ez3xJAm' }}
+          RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY || '6LfG9lktAAAAAGYnPjxQEb81GB5pqP-vc87tY08b' }}
+          NEXT_PUBLIC_ADSENSE_CLIENT: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-3653662664461490' }}
         run: npm run build
 
       - name: Fast Deploy to IIS Folder
@@ -69,6 +73,7 @@ jobs:
           Copy-Item -Path "web.config" -Destination "$targetFolder\web.config" -Force
           Copy-Item -Path "package.json" -Destination "$targetFolder\package.json" -Force
           Copy-Item -Path "package-lock.json" -Destination "$targetFolder\package-lock.json" -Force
+          if (Test-Path ".env.local") { Copy-Item -Path ".env.local" -Destination "$targetFolder\.env.local" -Force }
 
           # Safely start AppPool if it exists
           try {
