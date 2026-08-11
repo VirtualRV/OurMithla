@@ -7,6 +7,9 @@ import { getAllPosts, getPostBySlug } from "@/lib/blog"
 import { BlogInteractions } from "@/components/blog/blog-interactions"
 import { BlogTranslationWrapper } from "@/components/blog/blog-translation-wrapper"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
