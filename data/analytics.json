@@ -1,74 +1,10 @@
 [
   {
     "sessionId": "sess_1786462796308_g51d2n",
-    "path": "/kundli",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-11T15:40:32.117Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1786462796308_g51d2n",
-    "path": "/horoscope",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-11T15:40:28.493Z",
-    "durationSeconds": 60
-  },
-  {
-    "sessionId": "sess_1786462796308_g51d2n",
     "path": "/",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-11T15:39:56.718Z",
-    "durationSeconds": 30
-  },
-  {
-    "sessionId": "sess_1786387709710_nb1mhe",
-    "path": "/kundli",
     "referrer": "localhost",
     "device": "Desktop",
-    "timestamp": "2026-08-10T19:45:33.065Z",
-    "durationSeconds": 66900
-  },
-  {
-    "sessionId": "sess_1786387709710_nb1mhe",
-    "path": "/panchang",
-    "referrer": "localhost",
-    "device": "Desktop",
-    "timestamp": "2026-08-10T19:45:31.002Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1786268541542_ubr99t",
-    "path": "/contact",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-09T09:42:36.335Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1786268541542_ubr99t",
-    "path": "/panchang",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-09T09:42:35.527Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1786268541542_ubr99t",
-    "path": "/blog",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-09T09:42:34.241Z",
-    "durationSeconds": 1
-  },
-  {
-    "sessionId": "sess_1786268541542_ubr99t",
-    "path": "/",
-    "referrer": "Direct",
-    "device": "Desktop",
-    "timestamp": "2026-08-09T09:42:21.819Z",
-    "durationSeconds": 12
+    "timestamp": "2026-08-11T15:45:59.295Z",
+    "durationSeconds": 160
   }
 ]
