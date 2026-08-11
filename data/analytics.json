@@ -1,10 +1,50 @@
 [
   {
     "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/contact",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T16:04:55.507Z",
+    "durationSeconds": 712
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/horoscope",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T16:02:48.594Z",
+    "durationSeconds": 5
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/kundli",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T16:02:42.551Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/blog",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T16:02:39.914Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/panchang",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T16:02:37.396Z",
+    "durationSeconds": 80
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
     "path": "/",
     "referrer": "localhost",
     "device": "Desktop",
     "timestamp": "2026-08-11T15:45:59.295Z",
-    "durationSeconds": 160
+    "durationSeconds": 990
   }
 ]
