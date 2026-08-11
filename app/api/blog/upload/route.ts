@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
+import { getSettings } from "@/lib/settings"
 
 const MAX_BYTES = 5 * 1024 * 1024 // 5MB
 const ALLOWED = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"])
 
 export async function POST(request: Request) {
   try {
+    const settings = await getSettings()
+    if (!settings.allowPublicBlogSubmit) {
+      return NextResponse.json(
+        { error: "Public blog submissions are currently disabled by the admin." },
+        { status: 403 },
+      )
+    }
+
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 

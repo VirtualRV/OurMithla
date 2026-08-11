@@ -1,10 +1,18 @@
 [
   {
-    "sessionId": "sess_1786387044199_f32xaa",
-    "path": "/",
-    "referrer": "Direct",
-    "device": "Mobile",
-    "timestamp": "2026-08-10T18:42:50.148Z",
-    "durationSeconds": 160
+    "sessionId": "sess_1786387709710_nb1mhe",
+    "path": "/kundli",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-10T19:45:33.065Z",
+    "durationSeconds": 66900
+  },
+  {
+    "sessionId": "sess_1786387709710_nb1mhe",
+    "path": "/panchang",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "timestamp": "2026-08-10T19:45:31.002Z",
+    "durationSeconds": 1
   }
 ]

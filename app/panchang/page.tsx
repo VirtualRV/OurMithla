@@ -50,11 +50,11 @@ export default function PanchangPage() {
           onLocationChange={setLocationId}
         />
 
-        <UpcomingEventsBanner date={date} locationId={locationId} />
-
         <MainDetails panchang={panchang} />
 
         <SunMoon panchang={panchang} />
+
+        <UpcomingEventsBanner date={date} locationId={locationId} />
 
         <AdSlot variant="leaderboard" slot="panchang-mid" />
 

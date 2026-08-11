@@ -9,7 +9,9 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
+import { SiteSettingsProvider } from '@/components/site-settings-provider'
 import { ADSENSE_CLIENT } from '@/lib/adsense'
+import { getSettings } from '@/lib/settings'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -81,11 +83,13 @@ export const viewport: Viewport = {
   themeColor: '#c8622d',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const settings = await getSettings()
+
   return (
     <html lang="en" suppressHydrationWarning className={`bg-background ${inter.variable} ${marcellus.variable}`}>
       <head>
@@ -105,11 +109,13 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <I18nProvider>
-            <SiteHeader />
-            <div className="min-h-[calc(100vh-4rem)]">{children}</div>
-            <SiteFooter />
-          </I18nProvider>
+          <SiteSettingsProvider initial={settings}>
+            <I18nProvider>
+              <SiteHeader />
+              <div className="min-h-[calc(100vh-4rem)]">{children}</div>
+              <SiteFooter />
+            </I18nProvider>
+          </SiteSettingsProvider>
           <PwaInstallPrompt />
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}

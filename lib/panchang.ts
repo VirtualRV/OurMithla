@@ -204,6 +204,9 @@ export type Panchang = {
   }
   festivals: string[]
   fastingNote: string
+  /** Sidereal moon rashi index 0–11 (Mesha…Meena), matches Lahiri calculation. */
+  moonRashiIndex: number
+  moonRashi: string
 }
 
 function pad(n: number): string {
@@ -303,6 +306,22 @@ export function getPanchang(date: Date, locationId: string): Panchang {
   // Rashi of Sun determines Hindu Solar Month (Zodiac: Mesha=0 to Meena=11)
   // Cancer (Karka=3) -> Shravana (Index 4: सावन)
   const sunRashiIndex = Math.floor(sunNirayana / 30) % 12
+  const moonRashiIndex = Math.floor(moonNirayana / 30) % 12
+  const MOON_RASHIS = [
+    'Mesha',
+    'Vrishabha',
+    'Mithuna',
+    'Karka',
+    'Simha',
+    'Kanya',
+    'Tula',
+    'Vrishchika',
+    'Dhanu',
+    'Makara',
+    'Kumbha',
+    'Meena',
+  ]
+  const moonRashi = MOON_RASHIS[moonRashiIndex]
   const amantaMonthIndex = (sunRashiIndex + 1) % 12
   const amanta = AMANTA_MONTHS[amantaMonthIndex]
 
@@ -561,6 +580,8 @@ export function getPanchang(date: Date, locationId: string): Panchang {
     vishnuStatus,
     festivals,
     fastingNote,
+    moonRashiIndex,
+    moonRashi,
   }
 }
 

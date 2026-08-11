@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server"
 import { submitUserPost } from "@/lib/blog"
 import { CATEGORIES } from "@/lib/blog-types"
+import { getSettings } from "@/lib/settings"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function POST(request: Request) {
   try {
+    const settings = await getSettings()
+    if (!settings.allowPublicBlogSubmit) {
+      return NextResponse.json(
+        { error: "Public blog submissions are currently disabled by the admin." },
+        { status: 403 },
+      )
+    }
+
     const body = await request.json()
     const title = typeof body.title === "string" ? body.title.trim() : ""
     const excerpt = typeof body.excerpt === "string" ? body.excerpt.trim() : ""

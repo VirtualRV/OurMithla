@@ -1,0 +1,9 @@
+{
+  "allowPublicBlogSubmit": true,
+  "enableHoroscope": true,
+  "enableBirthChart": true,
+  "enableProviderSwiss": true,
+  "enableProviderProkerala": true,
+  "enableProviderAstrologyApi": true,
+  "enableProviderFreeAstroApi": true
+}

@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+import { getSettings } from "@/lib/settings"
 import { SubmitPostForm } from "@/components/blog/submit-post-form"
 
 export const metadata: Metadata = {
@@ -7,7 +9,12 @@ export const metadata: Metadata = {
     "Share your Mithila story, festival memory, or cultural article. Submissions are reviewed by OurMithla admins before publishing.",
 }
 
-export default function SubmitPage() {
+export default async function SubmitPage() {
+  const settings = await getSettings()
+  if (!settings.allowPublicBlogSubmit) {
+    redirect("/blog")
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="mb-8 text-center">

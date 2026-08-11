@@ -49,6 +49,7 @@ function validate(name: string, email: string, phone: string, message: string): 
 }
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ""
+const CAPTCHA_ENABLED = Boolean(SITE_KEY.trim())
 
 export default function ContactPage() {
   const { t } = useI18n()
@@ -60,11 +61,12 @@ export default function ContactPage() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [captchaToken, setCaptchaToken] = useState<string>("")
-  const [captchaReady, setCaptchaReady] = useState(false)
+  const [captchaReady, setCaptchaReady] = useState(!CAPTCHA_ENABLED)
   const [errorMsg, setErrorMsg] = useState("")
 
   // ── Render the reCAPTCHA widget once the script loads ──
   const renderRecaptcha = useCallback(() => {
+    if (!CAPTCHA_ENABLED) return
     if (
       recaptchaContainerRef.current &&
       widgetIdRef.current === null &&
@@ -87,6 +89,7 @@ export default function ContactPage() {
 
   // Expose callback for the ?onload= URL param on the script
   useEffect(() => {
+    if (!CAPTCHA_ENABLED) return
     window.onRecaptchaLoad = renderRecaptcha
     return () => {
       window.onRecaptchaLoad = undefined
@@ -104,8 +107,8 @@ export default function ContactPage() {
     // Field validation
     const fieldErrors = validate(name, email, phone, message)
 
-    // Captcha validation
-    if (!captchaToken) {
+    // Captcha validation only when configured
+    if (CAPTCHA_ENABLED && !captchaToken) {
       fieldErrors.captcha = "required"
     }
 
@@ -121,7 +124,7 @@ export default function ContactPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, message, captchaToken }),
+        body: JSON.stringify({ name, email, phone, message, captchaToken: captchaToken || undefined }),
       })
 
       const data = await res.json()
@@ -130,7 +133,7 @@ export default function ContactPage() {
         setErrorMsg(data.error ?? t("contact.form.error"))
         setState("error")
         // Reset captcha on failure
-        if (widgetIdRef.current !== null) {
+        if (CAPTCHA_ENABLED && widgetIdRef.current !== null) {
           window.grecaptcha?.reset(widgetIdRef.current)
         }
         setCaptchaToken("")
@@ -140,7 +143,7 @@ export default function ContactPage() {
       setState("success")
       formRef.current?.reset()
       setCaptchaToken("")
-      if (widgetIdRef.current !== null) {
+      if (CAPTCHA_ENABLED && widgetIdRef.current !== null) {
         window.grecaptcha?.reset(widgetIdRef.current)
       }
     } catch {
@@ -166,11 +169,13 @@ export default function ContactPage() {
 
   return (
     <>
-      {/* Load reCAPTCHA v2 script — onload fires renderRecaptcha */}
-      <Script
-        src={`https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit`}
-        strategy="lazyOnload"
-      />
+      {/* Load reCAPTCHA only when a site key is configured */}
+      {CAPTCHA_ENABLED && (
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit`}
+          strategy="lazyOnload"
+        />
+      )}
 
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         {/* Page heading */}
@@ -256,8 +261,9 @@ export default function ContactPage() {
             <div className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
               <ShieldCheck className="mt-0.5 size-5 shrink-0 text-green-600" />
               <p className="text-xs leading-relaxed text-muted-foreground">
-                This form is protected by Google reCAPTCHA. Your information is
-                sent securely and never shared with third parties.
+                {CAPTCHA_ENABLED
+                  ? "This form is protected by Google reCAPTCHA. Your information is sent securely and never shared with third parties."
+                  : "Your information is sent securely and never shared with third parties."}
               </p>
             </div>
           </aside>
@@ -394,20 +400,26 @@ export default function ContactPage() {
                   )}
                 </div>
 
-                {/* ── Google reCAPTCHA v2 widget ──────────────── */}
-                <div className="flex flex-col gap-1.5">
-                  <div
-                    ref={recaptchaContainerRef}
-                    id="recaptcha-widget"
-                    className="min-h-[78px]"
-                  />
-                  {!captchaReady && (
-                    <p className="text-xs text-muted-foreground">Loading security check…</p>
-                  )}
-                  {captchaError && (
-                    <p className="text-xs text-destructive">{captchaError}</p>
-                  )}
-                </div>
+                {/* ── Google reCAPTCHA v2 widget (optional) ───────── */}
+                {CAPTCHA_ENABLED ? (
+                  <div className="flex flex-col gap-1.5">
+                    <div
+                      ref={recaptchaContainerRef}
+                      id="recaptcha-widget"
+                      className="min-h-[78px]"
+                    />
+                    {!captchaReady && (
+                      <p className="text-xs text-muted-foreground">Loading security check…</p>
+                    )}
+                    {captchaError && (
+                      <p className="text-xs text-destructive">{captchaError}</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="rounded-xl border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+                    Security captcha is optional in this environment (no reCAPTCHA site key configured).
+                  </p>
+                )}
 
                 {/* Submit */}
                 <div className="flex items-center justify-between gap-4 border-t border-border pt-4">

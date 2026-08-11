@@ -22,18 +22,20 @@ import {
   BarChart3,
   Check,
   XCircle,
+  Settings,
 } from "lucide-react"
 import type { BlogPost, BlogPostInput } from "@/lib/blog-types"
 import { CATEGORIES } from "@/lib/blog-types"
 import { BlogEditorModal } from "@/components/admin/blog-editor-modal"
 import { AnalyticsDashboard } from "@/components/admin/analytics-dashboard"
+import { FeatureSettingsPanel } from "@/components/admin/feature-settings-panel"
 
 type Props = {
   initialPosts: BlogPost[]
 }
 
 export function BlogAdminView({ initialPosts }: Props) {
-  const [activeTab, setActiveTab] = useState<"articles" | "analytics">("articles")
+  const [activeTab, setActiveTab] = useState<"articles" | "analytics" | "settings">("articles")
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("All")
@@ -232,6 +234,18 @@ export function BlogAdminView({ initialPosts }: Props) {
                 <BarChart3 className="size-3.5" />
                 <span>Analytics & Traffic</span>
               </button>
+
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                  activeTab === "settings"
+                    ? "bg-card text-primary shadow-xs border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Settings className="size-3.5" />
+                <span>Features</span>
+              </button>
             </div>
           </div>
 
@@ -260,6 +274,8 @@ export function BlogAdminView({ initialPosts }: Props) {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {activeTab === "analytics" ? (
           <AnalyticsDashboard />
+        ) : activeTab === "settings" ? (
+          <FeatureSettingsPanel />
         ) : (
           <>
         {/* ── Stat Summary Cards ─────────────────────────── */}

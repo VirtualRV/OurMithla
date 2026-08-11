@@ -3,19 +3,30 @@
 import Link from "next/link"
 import { Mail } from "lucide-react"
 import { useI18n } from "@/components/i18n-provider"
+import { useSiteSettings } from "@/components/site-settings-provider"
 import type { TranslationKey } from "@/lib/i18n/translations"
 
-const LINKS: { href: string; key: TranslationKey }[] = [
+const LINKS: { href: string; key: TranslationKey; flag?: "submit" | "horoscope" | "kundli" }[] = [
   { href: "/", key: "nav.home" },
   { href: "/blog", key: "nav.blog" },
   { href: "/panchang", key: "nav.panchang" },
-  { href: "/submit", key: "nav.submit" },
+  { href: "/horoscope", key: "nav.horoscope", flag: "horoscope" },
+  { href: "/kundli", key: "nav.kundli", flag: "kundli" },
+  { href: "/submit", key: "nav.submit", flag: "submit" },
   { href: "/contact", key: "nav.contact" },
 ]
 
 export function SiteFooter() {
   const { t } = useI18n()
+  const { settings } = useSiteSettings()
   const year = new Date().getFullYear()
+
+  const links = LINKS.filter((item) => {
+    if (item.flag === "submit") return settings.allowPublicBlogSubmit
+    if (item.flag === "horoscope") return settings.enableHoroscope
+    if (item.flag === "kundli") return settings.enableBirthChart
+    return true
+  })
 
   return (
     <footer className="mt-16 border-t border-border bg-secondary/50">
@@ -50,7 +61,7 @@ export function SiteFooter() {
         <div>
           <h3 className="font-serif text-base text-foreground">{t("footer.links.title")}</h3>
           <ul className="mt-3 flex flex-col gap-2">
-            {LINKS.map((l) => (
+            {links.map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}

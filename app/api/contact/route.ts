@@ -113,39 +113,36 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    if (!captchaToken) {
-      return NextResponse.json(
-        { error: "Captcha token missing." },
-        { status: 400 },
-      )
-    }
-
-    // ── reCAPTCHA server-side verification ─────────────────
+    // ── reCAPTCHA (only when secret is configured) ─────────
     const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY
-    if (!recaptchaSecret) {
-      console.error("[contact] RECAPTCHA_SECRET_KEY is not set")
-      return NextResponse.json({ error: "Server configuration error." }, { status: 500 })
-    }
+    if (recaptchaSecret) {
+      if (!captchaToken) {
+        return NextResponse.json(
+          { error: "Captcha token missing." },
+          { status: 400 },
+        )
+      }
 
-    const verifyRes = await fetch(
-      "https://www.google.com/recaptcha/api/siteverify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          secret: recaptchaSecret,
-          response: captchaToken,
-        }),
-      },
-    )
-    const verifyData: RecaptchaVerifyResponse = await verifyRes.json()
-
-    if (!verifyData.success) {
-      console.warn("[contact] reCAPTCHA failed:", verifyData["error-codes"])
-      return NextResponse.json(
-        { error: "Captcha verification failed. Please try again." },
-        { status: 400 },
+      const verifyRes = await fetch(
+        "https://www.google.com/recaptcha/api/siteverify",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            secret: recaptchaSecret,
+            response: captchaToken,
+          }),
+        },
       )
+      const verifyData: RecaptchaVerifyResponse = await verifyRes.json()
+
+      if (!verifyData.success) {
+        console.warn("[contact] reCAPTCHA failed:", verifyData["error-codes"])
+        return NextResponse.json(
+          { error: "Captcha verification failed. Please try again." },
+          { status: 400 },
+        )
+      }
     }
 
     // ── Build nodemailer transporter ───────────────────────

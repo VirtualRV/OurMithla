@@ -8,23 +8,36 @@ import { cn } from "@/lib/utils"
 import { useI18n } from "@/components/i18n-provider"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useSiteSettings } from "@/components/site-settings-provider"
 import type { TranslationKey } from "@/lib/i18n/translations"
 
-const NAV: { href: string; key: TranslationKey }[] = [
+type NavItem = { href: string; key: TranslationKey; flag?: "submit" | "horoscope" | "kundli" }
+
+const NAV: NavItem[] = [
   { href: "/", key: "nav.home" },
   { href: "/blog", key: "nav.blog" },
   { href: "/panchang", key: "nav.panchang" },
-  { href: "/submit", key: "nav.submit" },
+  { href: "/horoscope", key: "nav.horoscope", flag: "horoscope" },
+  { href: "/kundli", key: "nav.kundli", flag: "kundli" },
+  { href: "/submit", key: "nav.submit", flag: "submit" },
   { href: "/contact", key: "nav.contact" },
 ]
 
 export function SiteHeader() {
   const { t } = useI18n()
+  const { settings } = useSiteSettings()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href)
+
+  const items = NAV.filter((item) => {
+    if (item.flag === "submit") return settings.allowPublicBlogSubmit
+    if (item.flag === "horoscope") return settings.enableHoroscope
+    if (item.flag === "kundli") return settings.enableBirthChart
+    return true
+  })
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
@@ -40,7 +53,7 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-          {NAV.map((item) => (
+          {items.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -74,7 +87,7 @@ export function SiteHeader() {
       {open && (
         <nav className="border-t border-border bg-background md:hidden" aria-label="Mobile">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
-            {NAV.map((item) => (
+            {items.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
