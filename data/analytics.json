@@ -14,5 +14,37 @@
     "device": "Desktop",
     "timestamp": "2026-08-10T19:45:31.002Z",
     "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786268541542_ubr99t",
+    "path": "/contact",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-09T09:42:36.335Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786268541542_ubr99t",
+    "path": "/panchang",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-09T09:42:35.527Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786268541542_ubr99t",
+    "path": "/blog",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-09T09:42:34.241Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786268541542_ubr99t",
+    "path": "/",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-09T09:42:21.819Z",
+    "durationSeconds": 12
   }
 ]
