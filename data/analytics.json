@@ -1,5 +1,29 @@
 [
   {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/kundli",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T15:40:32.117Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/horoscope",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T15:40:28.493Z",
+    "durationSeconds": 1
+  },
+  {
+    "sessionId": "sess_1786462796308_g51d2n",
+    "path": "/",
+    "referrer": "Direct",
+    "device": "Desktop",
+    "timestamp": "2026-08-11T15:39:56.718Z",
+    "durationSeconds": 30
+  },
+  {
     "sessionId": "sess_1786387709710_nb1mhe",
     "path": "/kundli",
     "referrer": "localhost",
