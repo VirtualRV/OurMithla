@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import { revalidatePath } from "next/cache"
 import { updatePost, deletePost, getPostById, approvePost, rejectPost } from "@/lib/blog"
 
 async function checkAuth(): Promise<boolean> {
@@ -43,22 +44,25 @@ export async function PUT(request: Request, { params }: Props) {
   try {
     const body = await request.json()
 
+    let updated = null
     if (body.action === "approve") {
-      const updated = await approvePost(numId)
-      if (!updated) return NextResponse.json({ error: "Post not found" }, { status: 404 })
-      return NextResponse.json(updated)
+      updated = await approvePost(numId)
+    } else if (body.action === "reject") {
+      updated = await rejectPost(numId)
+    } else {
+      updated = await updatePost(numId, body)
     }
 
-    if (body.action === "reject") {
-      const updated = await rejectPost(numId)
-      if (!updated) return NextResponse.json({ error: "Post not found" }, { status: 404 })
-      return NextResponse.json(updated)
-    }
-
-    const updated = await updatePost(numId, body)
     if (!updated) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 })
     }
+
+    revalidatePath("/blog")
+    revalidatePath("/")
+    if (updated.slug) {
+      revalidatePath(`/blog/${updated.slug}`)
+    }
+
     return NextResponse.json(updated)
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
@@ -81,10 +85,18 @@ export async function DELETE(_request: Request, { params }: Props) {
   }
 
   try {
+    const existing = await getPostById(numId)
     const success = await deletePost(numId)
     if (!success) {
       return NextResponse.json({ error: "Post not found or could not be deleted" }, { status: 404 })
     }
+
+    revalidatePath("/blog")
+    revalidatePath("/")
+    if (existing?.slug) {
+      revalidatePath(`/blog/${existing.slug}`)
+    }
+
     return NextResponse.json({ success: true })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

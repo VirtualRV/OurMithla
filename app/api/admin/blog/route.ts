@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import { revalidatePath } from "next/cache"
 import { getAllAdminPosts, createPost } from "@/lib/blog"
 
 async function checkAuth(): Promise<boolean> {
@@ -36,6 +37,8 @@ export async function POST(request: Request) {
     }
 
     const post = await createPost(body)
+    revalidatePath("/blog")
+    revalidatePath("/")
     return NextResponse.json(post, { status: 201 })
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })

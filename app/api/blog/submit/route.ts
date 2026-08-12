@@ -57,8 +57,6 @@ export async function POST(request: Request) {
       submitterEmail,
       slug: "",
       readMinutes: 1,
-      featured: false,
-      isPublished: false,
       publishedAt: new Date().toISOString().slice(0, 10),
     })
 

@@ -1,6 +1,9 @@
 import { getAllPosts } from "@/lib/blog"
 import { HomeView } from "@/components/home/home-view"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function HomePage() {
   const posts = await getAllPosts()
   const featured = posts.filter((p) => p.featured).slice(0, 2)
