@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import {
   Users,
   Eye,
@@ -11,12 +12,21 @@ import {
   RefreshCw,
   Globe,
   FileText,
-  ArrowUpRight,
   ShieldCheck,
+  MapPin,
+  Tablet,
+  UserRound,
+  ArrowLeft,
+  ExternalLink,
 } from "lucide-react"
-import type { AnalyticsSummary } from "@/lib/analytics"
+import type { AnalyticsSummary } from "@/lib/analytics-types"
 
-export function AnalyticsDashboard() {
+type Props = {
+  /** Show back link + page chrome for standalone /admin/analytics */
+  fullPage?: boolean
+}
+
+export function AnalyticsDashboard({ fullPage = false }: Props) {
   const [data, setData] = useState<AnalyticsSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -26,11 +36,8 @@ export function AnalyticsDashboard() {
     setError(null)
     try {
       const res = await fetch("/api/admin/analytics")
-      if (!res.ok) {
-        throw new Error("Failed to load analytics")
-      }
-      const json = await res.json()
-      setData(json)
+      if (!res.ok) throw new Error("Failed to load analytics")
+      setData(await res.json())
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -39,7 +46,9 @@ export function AnalyticsDashboard() {
   }
 
   useEffect(() => {
-    fetchAnalytics()
+    void fetchAnalytics()
+    const t = setInterval(() => void fetchAnalytics(), 30000)
+    return () => clearInterval(t)
   }, [])
 
   function formatTime(seconds: number): string {
@@ -52,34 +61,69 @@ export function AnalyticsDashboard() {
 
   function formatTimestamp(iso: string): string {
     if (!iso) return "Just now"
-    const d = new Date(iso)
-    return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    return new Date(iso).toLocaleString("en-IN", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
   }
 
   return (
     <div className="space-y-6">
-      {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
+      {fullPage && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            <ArrowLeft className="size-4" />
+            Back to Admin
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary"
+          >
+            View site <ExternalLink className="size-3.5" />
+          </Link>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="font-serif text-2xl font-bold text-foreground">Traffic & Visitor Analytics</h2>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-ping" /> Live Tracking
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-serif text-2xl font-bold text-foreground">
+              Traffic & Visitor Analytics
+            </h2>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600">
+              <span className="size-1.5 animate-ping rounded-full bg-emerald-500" /> Live
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Real-time tracking of visitor traffic, pageviews, top pages, and time spent on OurMithla.
+          <p className="mt-1 text-xs text-muted-foreground">
+            Page names, device details, visitor location, and known customer info when available.
           </p>
         </div>
 
-        <button
-          onClick={fetchAnalytics}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold text-foreground shadow-xs hover:bg-muted transition-all shrink-0 disabled:opacity-50"
-        >
-          <RefreshCw className={`size-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
-          <span>Refresh Analytics</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {!fullPage && (
+            <Link
+              href="/admin/analytics"
+              className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10"
+            >
+              <ExternalLink className="size-3.5" /> Full analytics view
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => void fetchAnalytics()}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold text-foreground shadow-xs hover:bg-muted disabled:opacity-50"
+          >
+            <RefreshCw className={`size-3.5 ${loading ? "animate-spin text-primary" : ""}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -88,125 +132,98 @@ export function AnalyticsDashboard() {
         </div>
       )}
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Visitors */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Visitors
-            </span>
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Users className="size-5" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {[
+          {
+            label: "Total Visitors",
+            value: data?.totalVisitors ?? 0,
+            hint: "Unique sessions",
+            icon: Users,
+            tone: "text-primary bg-primary/10",
+          },
+          {
+            label: "Pageviews",
+            value: data?.totalPageviews ?? 0,
+            hint: "All hits",
+            icon: Eye,
+            tone: "text-amber-600 bg-amber-500/10",
+          },
+          {
+            label: "Avg Time",
+            value: formatTime(data?.avgTimeSpentSeconds ?? 0),
+            hint: "Per session",
+            icon: Clock,
+            tone: "text-emerald-600 bg-emerald-500/10",
+          },
+          {
+            label: "Today",
+            value: data?.todayVisitors ?? 0,
+            hint: "Active today",
+            icon: TrendingUp,
+            tone: "text-sky-600 bg-sky-500/10",
+          },
+          {
+            label: "Known customers",
+            value: data?.customersSeen ?? 0,
+            hint: "Name / email saved",
+            icon: UserRound,
+            tone: "text-violet-600 bg-violet-500/10",
+          },
+        ].map((kpi) => (
+          <div key={kpi.label} className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {kpi.label}
+              </span>
+              <div className={`flex size-9 items-center justify-center rounded-2xl ${kpi.tone}`}>
+                <kpi.icon className="size-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-serif text-2xl font-bold text-foreground">
+                {loading ? "…" : kpi.value}
+              </span>
+              <span className="text-[11px] text-muted-foreground">{kpi.hint}</span>
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-serif text-foreground">
-              {loading ? "..." : data?.totalVisitors ?? 0}
-            </span>
-            <span className="text-xs font-medium text-muted-foreground">Unique sessions</span>
-          </div>
-        </div>
-
-        {/* Total Pageviews */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Total Pageviews
-            </span>
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <Eye className="size-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-serif text-foreground">
-              {loading ? "..." : data?.totalPageviews ?? 0}
-            </span>
-            <span className="text-xs font-medium text-muted-foreground">Page visits</span>
-          </div>
-        </div>
-
-        {/* Avg Time Spent */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Avg Time Spent
-            </span>
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <Clock className="size-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-serif text-foreground">
-              {loading ? "..." : formatTime(data?.avgTimeSpentSeconds ?? 0)}
-            </span>
-            <span className="text-xs font-medium text-muted-foreground">Per session</span>
-          </div>
-        </div>
-
-        {/* Today's Visitors */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Today's Visitors
-            </span>
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
-              <TrendingUp className="size-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-serif text-foreground">
-              {loading ? "..." : data?.todayVisitors ?? 0}
-            </span>
-            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 font-semibold">
-              Active today
-            </span>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Main Content Grid: Top Pages & Device Breakdown */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Top Visited Pages (2 cols) */}
-        <div className="lg:col-span-2 rounded-3xl border border-border bg-card p-6 shadow-sm space-y-4">
+        <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between border-b border-border pb-4">
             <div className="flex items-center gap-2">
               <FileText className="size-5 text-primary" />
-              <h3 className="font-serif text-lg font-bold text-foreground">Most Visited Pages</h3>
+              <h3 className="font-serif text-lg font-bold text-foreground">Most visited pages</h3>
             </div>
-            <span className="text-xs text-muted-foreground">Views & Avg Duration</span>
           </div>
-
           <div className="space-y-3">
             {loading ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">Loading top pages...</div>
-            ) : !data?.topPages || data.topPages.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                No visitor traffic recorded yet. Visit any page on the site to see analytics!
-              </div>
+              <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
+            ) : !data?.topPages?.length ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No traffic yet. Browse the site to populate analytics.
+              </p>
             ) : (
               data.topPages.map((page, idx) => (
                 <div
                   key={page.path}
-                  className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/20 px-4 py-3 hover:bg-muted/40 transition-colors"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex min-w-0 items-center gap-3">
                     <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                       {idx + 1}
                     </span>
-                    <span className="font-mono text-sm font-semibold text-foreground truncate max-w-[280px] sm:max-w-[400px]">
-                      {page.path}
-                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">
+                        {page.pageName || page.path}
+                      </p>
+                      <p className="truncate font-mono text-[11px] text-muted-foreground">{page.path}</p>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-4 text-xs shrink-0">
-                    <div className="text-right">
-                      <span className="font-bold text-foreground">{page.views}</span>{" "}
-                      <span className="text-muted-foreground">views</span>
-                    </div>
-                    <div className="rounded-lg bg-background px-2.5 py-1 text-muted-foreground font-medium border border-border">
-                      ⏱ {formatTime(page.avgTimeSeconds)}
-                    </div>
+                  <div className="shrink-0 text-right text-xs">
+                    <p className="font-bold text-foreground">{page.views} views</p>
+                    <p className="text-muted-foreground">{formatTime(page.avgTimeSeconds)}</p>
                   </div>
                 </div>
               ))
@@ -214,113 +231,166 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        {/* Device Breakdown */}
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm space-y-5">
+        <div className="space-y-5 rounded-3xl border border-border bg-card p-6 shadow-sm">
           <div className="flex items-center gap-2 border-b border-border pb-4">
             <Monitor className="size-5 text-primary" />
-            <h3 className="font-serif text-lg font-bold text-foreground">Device Distribution</h3>
+            <h3 className="font-serif text-lg font-bold text-foreground">Devices</h3>
           </div>
-
-          <div className="space-y-4">
-            {/* Desktop */}
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
+          {[
+            {
+              label: "Desktop",
+              pct: data?.deviceBreakdown.desktopPercent ?? 0,
+              icon: Monitor,
+              color: "bg-primary",
+            },
+            {
+              label: "Mobile",
+              pct: data?.deviceBreakdown.mobilePercent ?? 0,
+              icon: Smartphone,
+              color: "bg-amber-500",
+            },
+            {
+              label: "Tablet",
+              pct: data?.deviceBreakdown.tabletPercent ?? 0,
+              icon: Tablet,
+              color: "bg-sky-500",
+            },
+          ].map((row) => (
+            <div key={row.label}>
+              <div className="mb-1.5 flex justify-between text-xs font-semibold">
                 <span className="flex items-center gap-1.5 text-foreground">
-                  <Monitor className="size-3.5 text-primary" /> Desktop Browsers
+                  <row.icon className="size-3.5" /> {row.label}
                 </span>
-                <span className="text-primary font-bold">{data?.deviceBreakdown.desktopPercent ?? 50}%</span>
+                <span>{row.pct}%</span>
               </div>
-              <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-500"
-                  style={{ width: `${data?.deviceBreakdown.desktopPercent ?? 50}%` }}
-                />
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                <div className={`h-full rounded-full ${row.color}`} style={{ width: `${row.pct}%` }} />
               </div>
             </div>
-
-            {/* Mobile */}
-            <div>
-              <div className="flex justify-between text-xs font-semibold mb-1.5">
-                <span className="flex items-center gap-1.5 text-foreground">
-                  <Smartphone className="size-3.5 text-amber-500" /> Mobile Devices
-                </span>
-                <span className="text-amber-600 dark:text-amber-400 font-bold">
-                  {data?.deviceBreakdown.mobilePercent ?? 50}%
-                </span>
-              </div>
-              <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-amber-500 rounded-full transition-all duration-500"
-                  style={{ width: `${data?.deviceBreakdown.mobilePercent ?? 50}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
-            <p className="flex items-center gap-1.5 font-semibold text-foreground mb-1">
-              <ShieldCheck className="size-4 text-emerald-500" /> Privacy-First Analytics
+          ))}
+          <div className="rounded-2xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground">
+            <p className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
+              <ShieldCheck className="size-4 text-emerald-500" /> Privacy note
             </p>
-            Analytics are processed securely on server without cookies or personal data tracking.
+            Location uses device GPS (if allowed) or IP/timezone. Customer name/email only appears after
+            they use Contact or Submit.
           </div>
         </div>
       </div>
 
-      {/* Live Recent Visitor Sessions Log Table */}
-      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm space-y-4">
+      <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-2 border-b border-border pb-4">
+          <MapPin className="size-5 text-primary" />
+          <h3 className="font-serif text-lg font-bold text-foreground">Top locations</h3>
+        </div>
+        {!data?.topLocations?.length ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Locations will appear after visitors load pages (IP / device / timezone).
+          </p>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {data.topLocations.map((loc) => (
+              <div
+                key={loc.label}
+                className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/20 px-4 py-3"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">{loc.label}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {[loc.city, loc.region, loc.country].filter(Boolean).join(" · ") || "—"}
+                  </p>
+                </div>
+                <span className="shrink-0 text-sm font-bold text-primary">{loc.visits}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2">
             <Globe className="size-5 text-primary" />
-            <h3 className="font-serif text-lg font-bold text-foreground">Recent Visitor Activity Log</h3>
+            <h3 className="font-serif text-lg font-bold text-foreground">Recent visitor activity</h3>
           </div>
-          <span className="text-xs text-muted-foreground">Last 15 visitor hits</span>
+          <span className="text-xs text-muted-foreground">Latest hits</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full min-w-[900px] text-left text-xs">
             <thead>
-              <tr className="border-b border-border text-muted-foreground uppercase tracking-wider font-semibold">
-                <th className="py-3 px-3">Session ID</th>
-                <th className="py-3 px-3">Page Path</th>
-                <th className="py-3 px-3">Device</th>
-                <th className="py-3 px-3">Referrer</th>
-                <th className="py-3 px-3">Time Spent</th>
-                <th className="py-3 px-3">Time</th>
+              <tr className="border-b border-border font-semibold uppercase tracking-wider text-muted-foreground">
+                <th className="px-3 py-3">When</th>
+                <th className="px-3 py-3">Page</th>
+                <th className="px-3 py-3">Location</th>
+                <th className="px-3 py-3">Device</th>
+                <th className="px-3 py-3">Customer</th>
+                <th className="px-3 py-3">Time</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                    Loading visitor activity log...
+                    Loading…
                   </td>
                 </tr>
-              ) : !data?.recentVisitors || data.recentVisitors.length === 0 ? (
+              ) : !data?.recentVisitors?.length ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                    No recent visitor sessions logged yet.
+                    No sessions yet.
                   </td>
                 </tr>
               ) : (
                 data.recentVisitors.map((ev, i) => (
-                  <tr key={i} className="hover:bg-muted/30 transition-colors">
-                    <td className="py-3 px-3 font-mono font-medium text-foreground">{ev.sessionId}</td>
-                    <td className="py-3 px-3 font-mono text-primary font-semibold">{ev.path}</td>
-                    <td className="py-3 px-3">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium ${
-                          ev.device === "Mobile"
-                            ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-                            : "bg-primary/10 text-primary"
-                        }`}
-                      >
-                        {ev.device === "Mobile" ? <Smartphone className="size-3" /> : <Monitor className="size-3" />}
+                  <tr key={`${ev.sessionId}-${ev.path}-${i}`} className="hover:bg-muted/30">
+                    <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
+                      {formatTimestamp(ev.timestamp)}
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="font-semibold text-foreground">{ev.pageName || ev.path}</p>
+                      <p className="font-mono text-[11px] text-primary">{ev.path}</p>
+                      <p className="text-[11px] text-muted-foreground">via {ev.referrer}</p>
+                    </td>
+                    <td className="px-3 py-3">
+                      <p className="font-medium text-foreground">{ev.location?.label || "—"}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {ev.location?.timeZone || ev.deviceDetails?.timeZone || ""}
+                        {ev.location?.source ? ` · ${ev.location.source}` : ""}
+                      </p>
+                    </td>
+                    <td className="px-3 py-3">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 font-medium">
+                        {ev.device === "Mobile" ? (
+                          <Smartphone className="size-3" />
+                        ) : ev.device === "Tablet" ? (
+                          <Tablet className="size-3" />
+                        ) : (
+                          <Monitor className="size-3" />
+                        )}
                         {ev.device}
                       </span>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
+                        {[ev.deviceDetails?.os, ev.deviceDetails?.browser, ev.deviceDetails?.screen]
+                          .filter(Boolean)
+                          .join(" · ") || "—"}
+                      </p>
                     </td>
-                    <td className="py-3 px-3 text-muted-foreground">{ev.referrer}</td>
-                    <td className="py-3 px-3 font-bold text-foreground">{formatTime(ev.durationSeconds)}</td>
-                    <td className="py-3 px-3 text-muted-foreground">{formatTimestamp(ev.timestamp)}</td>
+                    <td className="px-3 py-3">
+                      {ev.customer?.name || ev.customer?.email ? (
+                        <>
+                          <p className="font-medium text-foreground">{ev.customer.name || "—"}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {ev.customer.email || ev.customer.phone || ""}
+                          </p>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">Guest</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 font-bold text-foreground">
+                      {formatTime(ev.durationSeconds)}
+                    </td>
                   </tr>
                 ))
               )}

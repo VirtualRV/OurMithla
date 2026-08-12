@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { CATEGORIES } from "@/lib/blog-types"
 import { useI18n } from "@/components/i18n-provider"
+import { saveVisitorProfile } from "@/lib/visitor-profile"
 
 export function SubmitPostForm() {
   const { t } = useI18n()
@@ -69,6 +70,7 @@ export function SubmitPostForm() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || "Submission failed")
+      saveVisitorProfile({ name: author, email, source: "submit" })
       setSuccess(true)
       setTitle("")
       setAuthor("")

@@ -167,7 +167,7 @@ export const translations = {
     "footer.follow.title": "Stay Connected",
     "footer.rights": "All rights reserved.",
 
-    "panchang.pageTitle": "Daily Panchang",
+    "panchang.pageTitle": "Daily Panchang & Maithili Patra",
   },
 
   hi: {
@@ -320,7 +320,7 @@ export const translations = {
     "footer.follow.title": "जुड़े रहें",
     "footer.rights": "सर्वाधिकार सुरक्षित।",
 
-    "panchang.pageTitle": "दैनिक पंचांग",
+    "panchang.pageTitle": "दैनिक पंचांग व मैथिली पात्र",
   },
 
   mai: {
@@ -473,7 +473,7 @@ export const translations = {
     "footer.follow.title": "जुड़ल रहू",
     "footer.rights": "सर्वाधिकार सुरक्षित।",
 
-    "panchang.pageTitle": "दैनिक पंचांग",
+    "panchang.pageTitle": "दैनिक पंचांग आ मैथिली पात्र",
   },
 } as const
 

@@ -641,3 +641,120 @@ export function getUpcomingEvents(startDate: Date, locationId: string, count = 5
   return events
 }
 
+/** One day cell for full-month Maithili Patra */
+export type PatraDay = {
+  date: Date
+  day: number
+  inMonth: boolean
+  tithiShort: string
+  pakshaShort: 'Shukla' | 'Krishna'
+  nakshatra: string
+  yoga: string
+  karana: string
+  vaar: string
+  amanta: string
+  purnimanta: string
+  festivals: string[]
+  isEkadashi: boolean
+  isPurnima: boolean
+  isAmavasya: boolean
+  sunrise: string
+  sunset: string
+}
+
+export type MonthPatra = {
+  year: number
+  month: number // 0–11
+  monthName: string
+  weeks: PatraDay[][]
+  days: PatraDay[]
+  festivalDays: PatraDay[]
+  hinduMonths: string[]
+  vikramSamvat: number
+  shakaSamvat: number
+}
+
+function startOfLocalDay(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+}
+
+function cleanFestivalName(name: string): string {
+  return name.replace(/^[^\p{L}\p{N}]+/u, '').trim()
+}
+
+/**
+ * Full Gregorian-month Maithili Patra (तिथि पत्र) —
+ * every day with tithi, nakshatra, festivals for reading like a wall calendar.
+ */
+export function getMonthPatra(year: number, month: number, locationId: string): MonthPatra {
+  const monthName = new Date(year, month, 1).toLocaleDateString('en-IN', {
+    month: 'long',
+    year: 'numeric',
+  })
+
+  const first = new Date(year, month, 1)
+  const last = new Date(year, month + 1, 0)
+  const startPad = first.getDay() // Sunday = 0
+  const totalCells = Math.ceil((startPad + last.getDate()) / 7) * 7
+
+  const days: PatraDay[] = []
+  const hinduMonthSet = new Set<string>()
+
+  for (let i = 0; i < totalCells; i++) {
+    const d = new Date(year, month, 1 - startPad + i)
+    const inMonth = d.getMonth() === month
+    const p = getPanchang(d, locationId)
+
+    const tithiValue = p.tithi.value
+    const tithiShort = tithiValue.split(' (')[0] || tithiValue
+    const pakshaShort: 'Shukla' | 'Krishna' = p.paksha.startsWith('Krishna')
+      ? 'Krishna'
+      : 'Shukla'
+
+    if (inMonth) {
+      hinduMonthSet.add(p.purnimanta)
+      hinduMonthSet.add(p.amanta)
+    }
+
+    days.push({
+      date: startOfLocalDay(d),
+      day: d.getDate(),
+      inMonth,
+      tithiShort,
+      pakshaShort,
+      nakshatra: p.nakshatra.value,
+      yoga: p.yoga.value,
+      karana: p.karana.value,
+      vaar: p.vaar.value,
+      amanta: p.amanta,
+      purnimanta: p.purnimanta,
+      festivals: p.festivals.map(cleanFestivalName),
+      isEkadashi: /Ekadashi/i.test(tithiShort) || p.festivals.some((f) => /Ekadashi/i.test(f)),
+      isPurnima: /Purnima/i.test(tithiShort),
+      isAmavasya: /Amavasya/i.test(tithiShort),
+      sunrise: p.sunrise,
+      sunset: p.sunset,
+    })
+  }
+
+  const weeks: PatraDay[][] = []
+  for (let w = 0; w < days.length; w += 7) {
+    weeks.push(days.slice(w, w + 7))
+  }
+
+  const mid = getPanchang(new Date(year, month, 15), locationId)
+
+  return {
+    year,
+    month,
+    monthName,
+    weeks,
+    days: days.filter((d) => d.inMonth),
+    festivalDays: days.filter((d) => d.inMonth && d.festivals.length > 0),
+    hinduMonths: Array.from(hinduMonthSet),
+    vikramSamvat: mid.vikramSamvat,
+    shakaSamvat: mid.shakaSamvat,
+  }
+}
+
+

@@ -7,6 +7,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
+import { GoogleAnalytics } from '@/components/google-analytics'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { SiteSettingsProvider } from '@/components/site-settings-provider'
@@ -102,6 +103,7 @@ export default async function RootLayout({
       </head>
       <body className="font-sans antialiased">
         <PwaRegister />
+        <GoogleAnalytics />
         <AnalyticsTracker />
         <ThemeProvider
           attribute="class"

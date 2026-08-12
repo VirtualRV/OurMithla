@@ -8,6 +8,8 @@ import { SunMoon } from "@/components/panchang/sun-moon"
 import { Muhurat } from "@/components/panchang/muhurat"
 import { MonthInfo } from "@/components/panchang/month-info"
 import { UpcomingEventsBanner } from "@/components/panchang/upcoming-events-banner"
+import { MaithiliPatra } from "@/components/panchang/maithili-patra"
+import { AuspiciousDaysPanel } from "@/components/panchang/auspicious-days-panel"
 import { AdSlot } from "@/components/ad-slot"
 import { useI18n } from "@/components/i18n-provider"
 
@@ -19,6 +21,8 @@ export default function PanchangPage() {
   const { t } = useI18n()
   const [date, setDate] = useState<Date>(() => startOfDay(new Date()))
   const [locationId, setLocationId] = useState<string>(LOCATIONS[0].id)
+  const [patraYear, setPatraYear] = useState(() => new Date().getFullYear())
+  const [patraMonth, setPatraMonth] = useState(() => new Date().getMonth())
 
   const panchang = useMemo(() => getPanchang(date, locationId), [date, locationId])
   const location = LOCATIONS.find((l) => l.id === locationId) ?? LOCATIONS[0]
@@ -62,9 +66,27 @@ export default function PanchangPage() {
 
         <MonthInfo panchang={panchang} />
 
+        <MaithiliPatra
+          date={date}
+          locationId={locationId}
+          onSelectDate={(d) => setDate(startOfDay(d))}
+          onMonthChange={(y, m) => {
+            setPatraYear(y)
+            setPatraMonth(m)
+          }}
+        />
+
+        <AuspiciousDaysPanel
+          year={patraYear}
+          month={patraMonth}
+          locationId={locationId}
+          onSelectDate={(d) => setDate(startOfDay(d))}
+        />
+
         <p className="px-2 pt-2 text-center text-xs text-muted-foreground text-pretty">
           Timings shown are illustrative and localised for {location.city}. For rituals and
-          important muhurats, please confirm with a qualified panchang or local purohit.
+          important muhurats (vivah, janeu, mundan), please confirm with a qualified panchang or
+          local purohit.
         </p>
       </div>
     </main>

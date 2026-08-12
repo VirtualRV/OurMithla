@@ -1,18 +1,52 @@
 [
   {
-    "sessionId": "sess_1786387709710_nb1mhe",
-    "path": "/kundli",
+    "sessionId": "sess_1786560101747_9p1s7d",
+    "path": "/panchang",
+    "pageName": "OurMithla | Culture, Almanac & Community of Mithila",
     "referrer": "localhost",
-    "device": "Desktop",
-    "timestamp": "2026-08-10T19:45:33.065Z",
-    "durationSeconds": 66900
+    "device": "Mobile",
+    "deviceDetails": {
+      "kind": "Mobile",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Cursor/3.15.6 Chrome/144.0.7559.236 Electron/40.10.3 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "timezone",
+      "timeZone": "Asia/Calcutta",
+      "ip": "::1",
+      "label": "Asia/Calcutta"
+    },
+    "timestamp": "2026-08-12T18:55:28.088Z",
+    "durationSeconds": 320
   },
   {
-    "sessionId": "sess_1786387709710_nb1mhe",
-    "path": "/panchang",
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/submit",
+    "pageName": "Submit an Article",
     "referrer": "localhost",
     "device": "Desktop",
-    "timestamp": "2026-08-10T19:45:31.002Z",
-    "durationSeconds": 1
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "timezone",
+      "timeZone": "Asia/Calcutta",
+      "ip": "::1",
+      "label": "Asia/Calcutta"
+    },
+    "timestamp": "2026-08-12T18:55:18.488Z",
+    "durationSeconds": 309
   }
 ]

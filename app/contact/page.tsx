@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import Script from "next/script"
 import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, Phone, ShieldCheck } from "lucide-react"
 import { useI18n } from "@/components/i18n-provider"
+import { saveVisitorProfile } from "@/lib/visitor-profile"
 
 // ── grecaptcha global type declaration ─────────────────
 declare global {
@@ -141,6 +142,7 @@ export default function ContactPage() {
       }
 
       setState("success")
+      saveVisitorProfile({ name, email, phone, source: "contact" })
       formRef.current?.reset()
       setCaptchaToken("")
       if (CAPTCHA_ENABLED && widgetIdRef.current !== null) {
