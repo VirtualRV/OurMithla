@@ -21,8 +21,8 @@
       "ip": "::1",
       "label": "Asia/Calcutta"
     },
-    "timestamp": "2026-08-12T18:55:48.089Z",
-    "durationSeconds": 340
+    "timestamp": "2026-08-12T18:56:18.090Z",
+    "durationSeconds": 370
   },
   {
     "sessionId": "sess_1786560497370_18zusy",
@@ -46,7 +46,7 @@
       "ip": "::1",
       "label": "Asia/Calcutta"
     },
-    "timestamp": "2026-08-12T18:55:18.488Z",
-    "durationSeconds": 309
+    "timestamp": "2026-08-12T18:56:18.464Z",
+    "durationSeconds": 369
   }
 ]
