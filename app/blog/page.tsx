@@ -6,9 +6,10 @@ export const dynamic = "force-dynamic"
 export const revalidate = 0
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Mithila Blog — Madhubani, Chhath & Heritage",
   description:
-    "Stories and knowledge from the heart of Mithila — Madhubani art, festivals, cuisine, heritage, and literature.",
+    "Stories from Mithila — Madhubani painting, Chhath Puja, Sama-Chakeva, Vidyapati, makhana, and Janakpur heritage in English, Hindi, and Maithili.",
+  alternates: { canonical: "https://ourmithla.com/blog" },
 }
 
 export default async function BlogPage() {

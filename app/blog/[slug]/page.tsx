@@ -22,11 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPostBySlug(slug)
   if (!post) return { title: "Post Not Found" }
   return {
-    title: post.title,
+    title: `${post.title} | Mithila`,
     description: post.excerpt,
+    alternates: { canonical: `https://ourmithla.com/blog/${post.slug}` },
+    keywords: ["Mithila", "Maithili", post.category, post.title],
     openGraph: {
       title: post.title,
       description: post.excerpt,
+      url: `https://ourmithla.com/blog/${post.slug}`,
+      type: "article",
       images: post.coverImage ? [{ url: post.coverImage }] : [],
     },
   }

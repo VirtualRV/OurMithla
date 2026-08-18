@@ -8,12 +8,26 @@ import type { TranslationKey } from "@/lib/i18n/translations"
 
 const LINKS: { href: string; key: TranslationKey; flag?: "submit" | "horoscope" | "kundli" }[] = [
   { href: "/", key: "nav.home" },
+  { href: "/about", key: "footer.about.title" },
   { href: "/blog", key: "nav.blog" },
   { href: "/panchang", key: "nav.panchang" },
   { href: "/horoscope", key: "nav.horoscope", flag: "horoscope" },
   { href: "/kundli", key: "nav.kundli", flag: "kundli" },
   { href: "/submit", key: "nav.submit", flag: "submit" },
   { href: "/contact", key: "nav.contact" },
+]
+
+const SEO_BACKLINKS = [
+  { href: "/panchang", label: "Mithila Panchang" },
+  { href: "/panchang", label: "Maithili Patra" },
+  { href: "/kundli", label: "Janam Kundli" },
+  { href: "/horoscope", label: "Mithila Horoscope" },
+  { href: "/blog/chhath-puja-great-festival-of-the-sun", label: "Chhath Puja" },
+  { href: "/blog/timeless-art-of-madhubani-painting", label: "Madhubani painting" },
+  { href: "/blog/sita-and-the-soul-of-janakpur", label: "Janakpur & Sita" },
+  { href: "/blog/makhana-mithila-superfood", label: "Makhana of Mithila" },
+  { href: "/blog/vidyapati-poet-of-the-people", label: "Vidyapati" },
+  { href: "/about", label: "About Mithila" },
 ]
 
 export function SiteFooter() {
@@ -30,7 +44,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-16 border-t border-border bg-secondary/50">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center rounded-full bg-primary font-serif text-lg text-primary-foreground">
@@ -73,6 +87,22 @@ export function SiteFooter() {
             ))}
           </ul>
         </div>
+
+        <div>
+          <h3 className="font-serif text-base text-foreground">Search Mithila</h3>
+          <ul className="mt-3 flex flex-col gap-2">
+            {SEO_BACKLINKS.map((l) => (
+              <li key={l.href + l.label}>
+                <Link
+                  href={l.href}
+                  className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="border-t border-border">
@@ -91,6 +121,7 @@ export function SiteFooter() {
           <div>
             <Link
               href="/admin"
+              rel="nofollow"
               className="text-muted-foreground/70 hover:text-primary transition-colors font-medium"
             >
               Admin Panel

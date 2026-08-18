@@ -3,6 +3,7 @@ import fs from "fs"
 import path from "path"
 import type {
   AnalyticsEvent,
+  AnalyticsRange,
   AnalyticsSummary,
   CustomerDetails,
   DeviceDetails,
@@ -12,6 +13,7 @@ import type {
 
 export type {
   AnalyticsEvent,
+  AnalyticsRange,
   AnalyticsSummary,
   CustomerDetails,
   DeviceDetails,
@@ -115,21 +117,36 @@ export async function trackSessionEvent(data: {
   await writeAnalyticsEvents(events)
 }
 
-export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
-  const events = await readAnalyticsEvents()
+export async function getAnalyticsSummary(
+  range: AnalyticsRange = "all",
+): Promise<AnalyticsSummary> {
+  const allEvents = await readAnalyticsEvents()
+  const now = new Date()
+  const to = now.toISOString()
+  const fromMs = rangeStartMs(range, now)
+  const events = fromMs == null ? allEvents : allEvents.filter((e) => new Date(e.timestamp).getTime() >= fromMs)
+  const from = fromMs == null ? null : new Date(fromMs).toISOString()
+  const rangeLabel = RANGE_LABELS[range]
+
+  const empty: AnalyticsSummary = {
+    range,
+    rangeLabel,
+    from,
+    to,
+    totalVisitors: 0,
+    totalPageviews: 0,
+    todayVisitors: 0,
+    avgTimeSpentSeconds: 0,
+    topPages: [],
+    topLocations: [],
+    recentVisitors: [],
+    daily: [],
+    deviceBreakdown: { mobilePercent: 50, desktopPercent: 50, tabletPercent: 0 },
+    customersSeen: 0,
+  }
 
   if (events.length === 0) {
-    return {
-      totalVisitors: 0,
-      totalPageviews: 0,
-      todayVisitors: 0,
-      avgTimeSpentSeconds: 0,
-      topPages: [],
-      topLocations: [],
-      recentVisitors: [],
-      deviceBreakdown: { mobilePercent: 50, desktopPercent: 50, tabletPercent: 0 },
-      customersSeen: 0,
-    }
+    return empty
   }
 
   const uniqueSessions = new Set(events.map((e) => e.sessionId))
@@ -200,14 +217,64 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   ).size
 
   return {
+    range,
+    rangeLabel,
+    from,
+    to,
     totalVisitors,
     totalPageviews,
     todayVisitors,
     avgTimeSpentSeconds,
     topPages,
     topLocations,
-    recentVisitors: events.slice(0, 40),
+    recentVisitors: events.slice(0, 80),
+    daily: buildDaily(events, fromMs, now),
     deviceBreakdown: { mobilePercent, desktopPercent, tabletPercent },
     customersSeen,
   }
+}
+
+const RANGE_LABELS: Record<AnalyticsRange, string> = {
+  today: "Today",
+  "7d": "Last 7 days",
+  "30d": "Last 30 days",
+  "90d": "Last 90 days",
+  all: "All time",
+}
+
+function rangeStartMs(range: AnalyticsRange, now: Date): number | null {
+  if (range === "all") return null
+  const d = new Date(now)
+  if (range === "today") {
+    d.setHours(0, 0, 0, 0)
+    return d.getTime()
+  }
+  const days = range === "7d" ? 7 : range === "30d" ? 30 : 90
+  return now.getTime() - days * 24 * 60 * 60 * 1000
+}
+
+function buildDaily(events: AnalyticsEvent[], fromMs: number | null, now: Date) {
+  const start = fromMs ?? (() => {
+    const oldest = events.reduce((min, e) => Math.min(min, new Date(e.timestamp).getTime()), now.getTime())
+    return oldest
+  })()
+  const dayMs = 24 * 60 * 60 * 1000
+  const days: { date: string; visitors: number; pageviews: number }[] = []
+  const startDay = new Date(start)
+  startDay.setHours(0, 0, 0, 0)
+  for (let t = startDay.getTime(); t <= now.getTime(); t += dayMs) {
+    const key = new Date(t).toISOString().slice(0, 10)
+    const slice = events.filter((e) => e.timestamp.slice(0, 10) === key)
+    days.push({
+      date: key,
+      pageviews: slice.length,
+      visitors: new Set(slice.map((e) => e.sessionId)).size,
+    })
+  }
+  return days.slice(-90)
+}
+
+export function parseAnalyticsRange(raw: string | null): AnalyticsRange {
+  if (raw === "today" || raw === "7d" || raw === "30d" || raw === "90d" || raw === "all") return raw
+  return "all"
 }
