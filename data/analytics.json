@@ -1,6 +1,230 @@
 [
   {
     "sessionId": "sess_1786560497370_18zusy",
+    "path": "/horoscope",
+    "pageName": "Today's Horoscope",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.573485706238266,
+      "longitude": 77.25915758280084,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:16:48.403Z",
+    "durationSeconds": 150
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/kundli",
+    "pageName": "Birth Chart & Life Predictions",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.573485706238266,
+      "longitude": 77.25915758280084,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:14:09.337Z",
+    "durationSeconds": 6
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/contact",
+    "pageName": "OurMithla | Culture, Almanac & Community of Mithila",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.573485706238266,
+      "longitude": 77.25915758280084,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:14:14.484Z",
+    "durationSeconds": 209
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/panchang",
+    "pageName": "OurMithla | Culture, Almanac & Community of Mithila",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.5734516537752,
+      "longitude": 77.25921608066207,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:07:42.836Z",
+    "durationSeconds": 164
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/blog",
+    "pageName": "Blog",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.5734516537752,
+      "longitude": 77.25921608066207,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:04:58.592Z",
+    "durationSeconds": 3
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
+    "path": "/",
+    "pageName": "OurMithla | Culture, Almanac & Community of Mithila",
+    "referrer": "localhost",
+    "device": "Desktop",
+    "deviceDetails": {
+      "kind": "Desktop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.573485706238266,
+      "longitude": 77.25915758280084,
+      "timeZone": "Asia/Calcutta",
+      "label": "Delhi, Delhi, India"
+    },
+    "timestamp": "2026-08-12T19:14:17.675Z",
+    "durationSeconds": 8
+  },
+  {
+    "sessionId": "sess_1786560101747_9p1s7d",
+    "path": "/blog/test-community-story",
+    "pageName": "Test Community Story",
+    "referrer": "localhost",
+    "device": "Mobile",
+    "deviceDetails": {
+      "kind": "Mobile",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Cursor/3.15.6 Chrome/144.0.7559.236 Electron/40.10.3 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "timezone",
+      "timeZone": "Asia/Calcutta",
+      "ip": "::1",
+      "label": "Asia/Calcutta"
+    },
+    "timestamp": "2026-08-12T18:59:57.663Z",
+    "durationSeconds": 14
+  },
+  {
+    "sessionId": "sess_1786560101747_9p1s7d",
+    "path": "/",
+    "pageName": "OurMithla | Culture, Almanac & Community of Mithila",
+    "referrer": "localhost",
+    "device": "Mobile",
+    "deviceDetails": {
+      "kind": "Mobile",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Cursor/3.15.6 Chrome/144.0.7559.236 Electron/40.10.3 Safari/537.36",
+      "browser": "Chrome",
+      "os": "macOS",
+      "screen": "1512×982",
+      "language": "en-GB",
+      "timeZone": "Asia/Calcutta",
+      "touch": false
+    },
+    "location": {
+      "source": "timezone",
+      "timeZone": "Asia/Calcutta",
+      "ip": "::1",
+      "label": "Asia/Calcutta"
+    },
+    "timestamp": "2026-08-12T18:59:43.513Z",
+    "durationSeconds": 9
+  },
+  {
+    "sessionId": "sess_1786560497370_18zusy",
     "path": "/submit",
     "pageName": "Submit an Article",
     "referrer": "localhost",
@@ -16,13 +240,17 @@
       "touch": false
     },
     "location": {
-      "source": "timezone",
+      "source": "device",
+      "city": "Delhi",
+      "region": "Delhi",
+      "country": "India",
+      "latitude": 28.573485706238266,
+      "longitude": 77.25915758280084,
       "timeZone": "Asia/Calcutta",
-      "ip": "::1",
-      "label": "Asia/Calcutta"
+      "label": "Delhi, Delhi, India"
     },
-    "timestamp": "2026-08-12T18:58:18.475Z",
-    "durationSeconds": 489
+    "timestamp": "2026-08-12T19:14:11.504Z",
+    "durationSeconds": 542
   },
   {
     "sessionId": "sess_1786560101747_9p1s7d",
@@ -46,7 +274,7 @@
       "ip": "::1",
       "label": "Asia/Calcutta"
     },
-    "timestamp": "2026-08-12T18:58:18.118Z",
-    "durationSeconds": 490
+    "timestamp": "2026-08-12T19:16:54.638Z",
+    "durationSeconds": 625
   }
 ]

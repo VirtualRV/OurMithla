@@ -1,0 +1,149 @@
+name: Deploy to IIS Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Next.js Production Release
+        env:
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LfG9lktAAAAAN4TR70L0HLd_QG3U-2Z9ez3xJAm' }}
+          RECAPTCHA_SECRET_KEY: ${{ secrets.RECAPTCHA_SECRET_KEY || '6LfG9lktAAAAAGYnPjxQEb81GB5pqP-vc87tY08b' }}
+          NEXT_PUBLIC_ADSENSE_CLIENT: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT || 'ca-pub-3653662664461490' }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-C6FRM1K7RY' }}
+        run: npm run build
+
+      - name: Fast Deploy to IIS Folder
+        shell: powershell
+        run: |
+          $ErrorActionPreference = "Continue"
+          Import-Module WebAdministration -ErrorAction SilentlyContinue
+
+          $websiteName = "OurMithla"
+          $targetFolder = "C:\inetpub\wwwroot\ourmithla"
+
+          function Get-AppPoolName {
+            try {
+              $site = Get-Website -Name $websiteName -ErrorAction Stop
+              if ($site -and $site.applicationPool) { return [string]$site.applicationPool }
+            } catch {}
+            return $websiteName
+          }
+
+          function Stop-OurMithlaRuntime {
+            $pool = Get-AppPoolName
+            Write-Host "Stopping website '$websiteName' / AppPool '$pool'..."
+
+            try { Stop-Website -Name $websiteName -ErrorAction SilentlyContinue } catch {}
+            try {
+              if (Test-Path "IIS:\AppPools\$pool") {
+                Stop-WebAppPool -Name $pool -ErrorAction SilentlyContinue
+              }
+            } catch {}
+
+            # Wait until AppPool is actually Stopped (native .node files stay locked otherwise)
+            $deadline = (Get-Date).AddSeconds(90)
+            do {
+              Start-Sleep -Seconds 2
+              $state = $null
+              try { $state = (Get-WebAppPoolState -Name $pool).Value } catch {}
+              Write-Host "AppPool state: $state"
+              if ($state -eq "Stopped") { break }
+            } while ((Get-Date) -lt $deadline)
+
+            # Kill lingering node/iisnode workers that still hold swisseph.node
+            Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue |
+              Where-Object {
+                $_.CommandLine -match 'ourmithla|iisnode|OurMithla' -or
+                $_.ExecutablePath -match 'iisnode'
+              } |
+              ForEach-Object {
+                Write-Host "Killing locked node PID $($_.ProcessId)"
+                Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+              }
+
+            Start-Sleep -Seconds 3
+          }
+
+          function Start-OurMithlaRuntime {
+            $pool = Get-AppPoolName
+            Write-Host "Starting AppPool '$pool' / website '$websiteName'..."
+            try {
+              if (Test-Path "IIS:\AppPools\$pool") {
+                Start-WebAppPool -Name $pool -ErrorAction SilentlyContinue
+              }
+            } catch {}
+            try { Start-Website -Name $websiteName -ErrorAction SilentlyContinue } catch {}
+          }
+
+          function Sync-Folder {
+            param(
+              [string]$Src,
+              [string]$Dest,
+              [string[]]$ExcludeDirs = @()
+            )
+            if (!(Test-Path $Dest)) {
+              New-Item -ItemType Directory -Force -Path $Dest | Out-Null
+            }
+
+            $xd = @()
+            if ($ExcludeDirs.Count -gt 0) {
+              $xd = @("/XD") + $ExcludeDirs
+            }
+
+            # /MIR mirror; /R /W retry locked files; quieter logs
+            & robocopy $Src $Dest /MIR /MT:8 /R:20 /W:3 /NP /NFL /NDL @xd
+            if ($LASTEXITCODE -le 7) {
+              $global:LASTEXITCODE = 0
+            } else {
+              throw "Robocopy failed for $Src -> $Dest (exit $LASTEXITCODE)"
+            }
+          }
+
+          if (!(Test-Path -Path $targetFolder)) {
+            New-Item -ItemType Directory -Force -Path $targetFolder | Out-Null
+          }
+
+          # MUST stop runtime before copying native modules (@swisseph/*.node)
+          Stop-OurMithlaRuntime
+
+          # Remove previous locked native binaries if still present
+          Get-ChildItem -Path $targetFolder -Recurse -Filter "swisseph.node" -ErrorAction SilentlyContinue |
+            ForEach-Object {
+              Write-Host "Removing locked native: $($_.FullName)"
+              Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue
+            }
+
+          # Skip Next fetch cache — not needed on IIS and causes EXTRA noise
+          Sync-Folder ".next" "$targetFolder\.next" -ExcludeDirs @("cache")
+          Sync-Folder "public" "$targetFolder\public"
+          Sync-Folder "data" "$targetFolder\data"
+          Sync-Folder "node_modules" "$targetFolder\node_modules"
+
+          Copy-Item -Path "server.js" -Destination "$targetFolder\server.js" -Force
+          Copy-Item -Path "web.config" -Destination "$targetFolder\web.config" -Force
+          Copy-Item -Path "package.json" -Destination "$targetFolder\package.json" -Force
+          Copy-Item -Path "package-lock.json" -Destination "$targetFolder\package-lock.json" -Force
+          if (Test-Path ".env") { Copy-Item -Path ".env" -Destination "$targetFolder\.env" -Force }
+          if (Test-Path ".env.local") { Copy-Item -Path ".env.local" -Destination "$targetFolder\.env.local" -Force }
+
+          Start-OurMithlaRuntime
+
+          $global:LASTEXITCODE = 0
+          Write-Host "Deploy complete."

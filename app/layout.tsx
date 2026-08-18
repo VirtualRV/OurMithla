@@ -13,6 +13,8 @@ import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { SiteSettingsProvider } from '@/components/site-settings-provider'
 import { ADSENSE_CLIENT } from '@/lib/adsense'
 import { getSettings } from '@/lib/settings'
+import { SeoJsonLd } from '@/components/seo-json-ld'
+import { DEFAULT_DESCRIPTION, SEO_KEYWORDS, SITE_NAME, SITE_URL } from '@/lib/site'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -28,20 +30,25 @@ const marcellus = Marcellus({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ourmithla.com'),
-  applicationName: 'OurMithla',
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   manifest: '/manifest.json',
   title: {
-    default: 'OurMithla | Culture, Almanac & Community of Mithila',
+    default: 'Mithila Panchang, Maithili Patra & Culture | OurMithla',
     template: '%s | OurMithla',
   },
-  description:
-    'OurMithla celebrates the living heritage of Mithila — cultural stories, festivals, Madhubani art, and the daily Hindu Panchang, in English, Hindi, and Maithili.',
-  keywords: ['Mithila', 'Panchang', 'Madhubani Art', 'Hindu Calendar', 'Maithili', 'Festivals'],
+  description: DEFAULT_DESCRIPTION,
+  keywords: SEO_KEYWORDS,
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'OurMithla',
+    title: SITE_NAME,
   },
   formatDetection: {
     telephone: false,
@@ -51,16 +58,16 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
-    url: 'https://ourmithla.com',
-    title: 'OurMithla | Culture, Almanac & Community of Mithila',
-    description: 'OurMithla celebrates the living heritage of Mithila — cultural stories, festivals, Madhubani art, and the daily Hindu Panchang.',
-    siteName: 'OurMithla',
+    locale: 'en_IN',
+    url: SITE_URL,
+    title: 'Mithila Panchang, Maithili Patra & Culture | OurMithla',
+    description: DEFAULT_DESCRIPTION,
+    siteName: SITE_NAME,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OurMithla | Culture, Almanac & Community of Mithila',
-    description: 'OurMithla celebrates the living heritage of Mithila — cultural stories, festivals, Madhubani art, and the daily Hindu Panchang.',
+    title: 'Mithila Panchang, Maithili Patra & Culture | OurMithla',
+    description: DEFAULT_DESCRIPTION,
   },
   icons: {
     icon: [
@@ -100,6 +107,7 @@ export default async function RootLayout({
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
           crossOrigin="anonymous"
         />
+        <SeoJsonLd />
       </head>
       <body className="font-sans antialiased">
         <PwaRegister />

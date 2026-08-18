@@ -4,9 +4,10 @@ import { getSettings } from "@/lib/settings"
 import { BirthChartView } from "@/components/kundli/birth-chart-view"
 
 export const metadata: Metadata = {
-  title: "Birth Chart & Life Predictions",
+  title: "Mithila Janam Kundli & Birth Chart",
   description:
-    "Generate your Janam Kundli (birth chart) with Lagna, planets, houses, and life guidance for career, relationships, wealth, health, and dharma.",
+    "Generate a Vedic Janam Kundli in the Mithila tradition — Lagna, planets, houses, and life guidance for career, relationships, wealth, and dharma.",
+  alternates: { canonical: "https://ourmithla.com/kundli" },
 }
 
 export default async function KundliPage() {

@@ -55,7 +55,19 @@ export type LocationStat = {
   visits: number
 }
 
+export type AnalyticsRange = "today" | "7d" | "30d" | "90d" | "all"
+
+export type DailyPoint = {
+  date: string
+  visitors: number
+  pageviews: number
+}
+
 export type AnalyticsSummary = {
+  range: AnalyticsRange
+  rangeLabel: string
+  from: string | null
+  to: string
   totalVisitors: number
   totalPageviews: number
   todayVisitors: number
@@ -63,6 +75,7 @@ export type AnalyticsSummary = {
   topPages: { path: string; pageName: string; views: number; avgTimeSeconds: number }[]
   topLocations: LocationStat[]
   recentVisitors: AnalyticsEvent[]
+  daily: DailyPoint[]
   deviceBreakdown: {
     mobilePercent: number
     desktopPercent: number

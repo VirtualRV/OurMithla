@@ -4,9 +4,10 @@ import { getSettings } from "@/lib/settings"
 import { HoroscopeView } from "@/components/horoscope/horoscope-view"
 
 export const metadata: Metadata = {
-  title: "Today's Horoscope",
+  title: "Today’s Mithila Horoscope by Rashi",
   description:
-    "Check today's Vedic horoscope by rashi — love, career, health, wealth, and spiritual guidance aligned with OurMithla Panchang.",
+    "Daily Vedic horoscope for Mithila — love, career, health, wealth, and spiritual guidance aligned with today’s Maithili Panchang.",
+  alternates: { canonical: "https://ourmithla.com/horoscope" },
 }
 
 export default async function HoroscopePage() {

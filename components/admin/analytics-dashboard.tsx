@@ -19,7 +19,15 @@ import {
   ArrowLeft,
   ExternalLink,
 } from "lucide-react"
-import type { AnalyticsSummary } from "@/lib/analytics-types"
+import type { AnalyticsRange, AnalyticsSummary } from "@/lib/analytics-types"
+
+const RANGES: { id: AnalyticsRange; label: string }[] = [
+  { id: "today", label: "Today" },
+  { id: "7d", label: "7 days" },
+  { id: "30d", label: "30 days" },
+  { id: "90d", label: "90 days" },
+  { id: "all", label: "All time" },
+]
 
 type Props = {
   /** Show back link + page chrome for standalone /admin/analytics */
@@ -28,14 +36,15 @@ type Props = {
 
 export function AnalyticsDashboard({ fullPage = false }: Props) {
   const [data, setData] = useState<AnalyticsSummary | null>(null)
+  const [range, setRange] = useState<AnalyticsRange>("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  async function fetchAnalytics() {
+  async function fetchAnalytics(nextRange: AnalyticsRange = range) {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch("/api/admin/analytics")
+      const res = await fetch(`/api/admin/analytics?range=${nextRange}`)
       if (!res.ok) throw new Error("Failed to load analytics")
       setData(await res.json())
     } catch (err) {
@@ -46,10 +55,11 @@ export function AnalyticsDashboard({ fullPage = false }: Props) {
   }
 
   useEffect(() => {
-    void fetchAnalytics()
-    const t = setInterval(() => void fetchAnalytics(), 30000)
+    void fetchAnalytics(range)
+    const t = setInterval(() => void fetchAnalytics(range), 30000)
     return () => clearInterval(t)
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range])
 
   function formatTime(seconds: number): string {
     if (!seconds || seconds <= 0) return "0s"
@@ -101,11 +111,26 @@ export function AnalyticsDashboard({ fullPage = false }: Props) {
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Page names, device details, visitor location, and known customer info when available.
+            {data?.rangeLabel || "All time"} — page names, visitor location, device details, and known
+            customers.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-1 rounded-xl border border-border bg-background p-1">
+            {RANGES.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setRange(r.id)}
+                className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
+                  range === r.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
           {!fullPage && (
             <Link
               href="/admin/analytics"
@@ -116,7 +141,7 @@ export function AnalyticsDashboard({ fullPage = false }: Props) {
           )}
           <button
             type="button"
-            onClick={() => void fetchAnalytics()}
+            onClick={() => void fetchAnalytics(range)}
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-xs font-bold text-foreground shadow-xs hover:bg-muted disabled:opacity-50"
           >
@@ -188,6 +213,32 @@ export function AnalyticsDashboard({ fullPage = false }: Props) {
           </div>
         ))}
       </div>
+
+      {!!data?.daily?.length && (
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+          <h3 className="font-serif text-lg font-bold text-foreground">
+            Daily traffic · {data.rangeLabel}
+          </h3>
+          <div className="mt-4 flex h-32 items-end gap-1">
+            {data.daily.map((d) => {
+              const max = Math.max(1, ...data.daily.map((x) => x.pageviews))
+              const h = Math.max(4, Math.round((d.pageviews / max) * 100))
+              return (
+                <div key={d.date} className="flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
+                  <div
+                    className="w-full rounded-t bg-primary/70"
+                    style={{ height: `${h}%` }}
+                    title={`${d.date}: ${d.pageviews} views, ${d.visitors} visitors`}
+                  />
+                </div>
+              )
+            })}
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Bars are pageviews by day in this time frame.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-4 rounded-3xl border border-border bg-card p-6 shadow-sm lg:col-span-2">
